@@ -1,0 +1,334 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samala Chumash Learning Portal</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #9a3412;
+      --primary-hover: #7c2d12;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 1.5rem;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2rem; }
+    header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem; }
+    header p { color: var(--text-muted); }
+    
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .nav button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Dictionary View */
+    .search-bar {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .word-list { display: grid; gap: 0.75rem; }
+    .word-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .samala-word { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
+    .english-word { color: var(--text-muted); font-size: 1rem; }
+
+    /* Flashcard View */
+    .flashcard-wrapper {
+      perspective: 1000px;
+      margin: 2rem auto;
+      max-width: 450px;
+      height: 250px;
+      cursor: pointer;
+    }
+    .flashcard {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .card-back { transform: rotateY(180deg); background: #fff7ed; }
+    .card-face h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .card-face p { color: var(--text-muted); font-size: 0.9rem; }
+    .card-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .btn:hover { background: var(--primary-hover); }
+
+    /* Quiz View */
+    .quiz-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .quiz-options {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .quiz-option {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .quiz-option:hover { border-color: var(--primary); }
+    .quiz-feedback { margin-top: 1rem; font-weight: 600; min-height: 24px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Samala Chumash Study Portal</h1>
+      <p>Interactive study companion for language preservation and learning</p>
+    </header>
+
+    <div class="nav">
+      <button class="active" onclick="switchTab('dict')">Dictionary</button>
+      <button onclick="switchTab('flashcards')">Flashcards</button>
+      <button onclick="switchTab('quiz')">Quick Quiz</button>
+    </div>
+
+    <!-- 1. Dictionary View -->
+    <section id="tab-dict" class="tab-content active">
+      <input type="text" id="searchInput" class="search-bar" placeholder="Search in Samala or English..." oninput="filterWords()" />
+      <div id="wordList" class="word-list"></div>
+    </section>
+
+    <!-- 2. Flashcard View -->
+    <section id="tab-flashcards" class="tab-content">
+      <div class="flashcard-wrapper" onclick="flipCard()">
+        <div id="flashcard" class="flashcard">
+          <div class="card-face card-front">
+            <h2 id="fcSamala" class="samala-word">---</h2>
+            <p>(Click to reveal meaning)</p>
+          </div>
+          <div class="card-face card-back">
+            <h2 id="fcEnglish" style="color: var(--primary);">---</h2>
+            <p>English Translation</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-controls">
+        <button class="btn" onclick="prevCard()">Previous</button>
+        <span id="fcCounter" style="align-self: center; font-weight: 500;">1 / 1</span>
+        <button class="btn" onclick="nextCard()">Next</button>
+      </div>
+    </section>
+
+    <!-- 3. Quiz View -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-box">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">What does this word mean?</p>
+        <h2 id="quizWord" class="samala-word" style="margin: 0.5rem 0 1rem; font-size: 2rem;">---</h2>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizFeedback" class="quiz-feedback"></div>
+        <button id="nextQuizBtn" class="btn" style="margin-top: 1rem; display: none;" onclick="setupQuizQuestion()">Next Question</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Starter Samala Chumash dataset (You can add as many words as you want here!)
+    const vocabulary = [
+      { samala: "Mikit", english: "House / Home" },
+      { samala: "Xanap", english: "Water" },
+      { samala: "‘Alapišma", english: "Sun" },
+      { samala: "Kut", english: "Fire" },
+      { samala: "‘Ayaq", english: "Earth / Ground" },
+      { samala: "Qsi’", english: "Wind / Air" },
+      { samala: "Pnu'", english: "Tree / Wood" },
+      { samala: "Sxami", english: "Fish" },
+      { samala: "Kux", english: "Heart" },
+      { samala: "Ha'i", english: "Yes" }
+    ];
+
+    // Navigation Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.target.classList.add('active');
+      if (tabId === 'flashcards') renderFlashcard();
+      if (tabId === 'quiz') setupQuizQuestion();
+    }
+
+    // Dictionary Render & Search
+    function renderDictionary(data) {
+      const list = document.getElementById('wordList');
+      list.innerHTML = '';
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'word-card';
+        div.innerHTML = `
+          <span class="samala-word">${item.samala}</span>
+          <span class="english-word">${item.english}</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function filterWords() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = vocabulary.filter(w => 
+        w.samala.toLowerCase().includes(q) || w.english.toLowerCase().includes(q)
+      );
+      renderDictionary(filtered);
+    }
+
+    // Flashcard Logic
+    let currentCardIndex = 0;
+    let isFlipped = false;
+
+    function renderFlashcard() {
+      isFlipped = false;
+      document.getElementById('flashcard').classList.remove('flipped');
+      const item = vocabulary[currentCardIndex];
+      document.getElementById('fcSamala').textContent = item.samala;
+      document.getElementById('fcEnglish').textContent = item.english;
+      document.getElementById('fcCounter').textContent = `${currentCardIndex + 1} / ${vocabulary.length}`;
+    }
+
+    function flipCard() {
+      isFlipped = !isFlipped;
+      document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+    }
+
+    function nextCard() {
+      currentCardIndex = (currentCardIndex + 1) % vocabulary.length;
+      renderFlashcard();
+    }
+
+    function prevCard() {
+      currentCardIndex = (currentCardIndex - 1 + vocabulary.length) % vocabulary.length;
+      renderFlashcard();
+    }
+
+    // Quiz Logic
+    function setupQuizQuestion() {
+      const feedback = document.getElementById('quizFeedback');
+      const nextBtn = document.getElementById('nextQuizBtn');
+      feedback.textContent = '';
+      nextBtn.style.display = 'none';
+
+      const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+      document.getElementById('quizWord').textContent = correct.samala;
+
+      // Pick 3 random distractor answers
+      let options = [correct.english];
+      while (options.length < 4 && options.length < vocabulary.length) {
+        const rand = vocabulary[Math.floor(Math.random() * vocabulary.length)].english;
+        if (!options.includes(rand)) options.push(rand);
+      }
+      options.sort(() => Math.random() - 0.5);
+
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === correct.english) {
+            feedback.textContent = "Correct! Kaqin' (Good)!";
+            feedback.style.color = "#16a34a";
+          } else {
+            feedback.textContent = `Not quite. Correct answer: ${correct.english}`;
+            feedback.style.color = "#dc2626";
+          }
+          nextBtn.style.display = 'inline-block';
+        };
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // Initial load
+    renderDictionary(vocabulary);
+  </script>
+</body>
+</html>
