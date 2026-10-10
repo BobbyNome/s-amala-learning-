@@ -1,16 +1,16 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samala Chumash Learning Portal</title>
+  <title>Sʰamala Chumash Dictionary & Study Portal</title>
   <style>
     :root {
       --bg: #f8fafc;
       --card-bg: #ffffff;
       --primary: #9a3412;
       --primary-hover: #7c2d12;
+      --accent: #d97706;
       --text: #1e293b;
       --text-muted: #64748b;
       --border: #e2e8f0;
@@ -24,25 +24,25 @@ html
       line-height: 1.6;
       padding: 1.5rem;
     }
-    .container { max-width: 800px; margin: 0 auto; }
-    header { text-align: center; margin-bottom: 2rem; }
-    header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem; }
-    header p { color: var(--text-muted); }
+    .container { max-width: 900px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 1.75rem; }
+    header h1 { color: var(--primary); font-size: 2.2rem; margin-bottom: 0.3rem; }
+    header p { color: var(--text-muted); font-size: 1rem; }
     
     .nav {
       display: flex;
       justify-content: center;
-      gap: 0.5rem;
+      gap: 0.75rem;
       margin-bottom: 1.5rem;
     }
     .nav button {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      padding: 0.6rem 1.2rem;
+      padding: 0.6rem 1.4rem;
       border-radius: 8px;
       font-size: 0.95rem;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
       transition: all 0.2s;
     }
     .nav button.active {
@@ -54,35 +54,79 @@ html
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
+    /* Alpha Filter Bar */
+    .alpha-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .alpha-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.65rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    .alpha-btn:hover, .alpha-btn.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
     /* Dictionary View */
+    .search-box {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
     .search-bar {
-      width: 100%;
+      flex: 1;
       padding: 0.8rem 1rem;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 1rem;
-      margin-bottom: 1.5rem;
+      outline: none;
     }
-    .word-list { display: grid; gap: 0.75rem; }
+    .search-bar:focus { border-color: var(--primary); }
+    .count-tag {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      text-align: right;
+    }
+
+    .word-list { display: grid; gap: 0.85rem; }
     .word-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.25rem;
+      border-radius: 10px;
+      padding: 1.1rem 1.3rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+    .word-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      box-shadow: var(--shadow);
+      align-items: baseline;
+      border-bottom: 1px solid #f1f5f9;
+      padding-bottom: 0.4rem;
     }
-    .samala-word { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
-    .english-word { color: var(--text-muted); font-size: 1rem; }
+    .samala-word { font-size: 1.25rem; font-weight: 700; color: var(--primary); }
+    .english-word { color: var(--text); font-size: 1.05rem; font-weight: 500; }
+    .word-notes { font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
 
     /* Flashcard View */
     .flashcard-wrapper {
       perspective: 1000px;
-      margin: 2rem auto;
-      max-width: 450px;
-      height: 250px;
+      margin: 1.5rem auto;
+      max-width: 480px;
+      height: 260px;
       cursor: pointer;
     }
     .flashcard {
@@ -90,7 +134,7 @@ html
       height: 100%;
       position: relative;
       transform-style: preserve-3d;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 12px;
       box-shadow: var(--shadow);
     }
@@ -123,11 +167,11 @@ html
       background: var(--primary);
       color: white;
       border: none;
-      padding: 0.6rem 1.2rem;
+      padding: 0.6rem 1.3rem;
       border-radius: 8px;
       cursor: pointer;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
     }
     .btn:hover { background: var(--primary-hover); }
 
@@ -139,7 +183,7 @@ html
       padding: 2rem;
       text-align: center;
       box-shadow: var(--shadow);
-      max-width: 500px;
+      max-width: 520px;
       margin: 0 auto;
     }
     .quiz-options {
@@ -150,10 +194,11 @@ html
     .quiz-option {
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 0.75rem;
+      padding: 0.85rem;
       border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
+      font-weight: 500;
       transition: 0.2s;
     }
     .quiz-option:hover { border-color: var(--primary); }
@@ -163,8 +208,8 @@ html
 <body>
   <div class="container">
     <header>
-      <h1>Samala Chumash Study Portal</h1>
-      <p>Interactive study companion for language preservation and learning</p>
+      <h1>Sʰamala Chumash Portal</h1>
+      <p>Applegate Dictionary Edition (July 2026 update)</p>
     </header>
 
     <div class="nav">
@@ -173,174 +218,53 @@ html
       <button onclick="switchTab('quiz')">Quick Quiz</button>
     </div>
 
-    <!-- 1. Dictionary View -->
+    <!-- DICTIONARY VIEW -->
     <section id="tab-dict" class="tab-content active">
-      <input type="text" id="searchInput" class="search-bar" placeholder="Search in Samala or English..." oninput="filterWords()" />
+      <div class="alpha-bar" id="alphaBar"></div>
+      <div class="search-box">
+        <input type="text" id="searchInput" class="search-bar" placeholder="Search in Sʰamala or English (diacritics optional)..." oninput="filterWords()" />
+      </div>
+      <div id="countTag" class="count-tag">Showing all words</div>
       <div id="wordList" class="word-list"></div>
     </section>
 
-    <!-- 2. Flashcard View -->
+    <!-- FLASHCARDS VIEW -->
     <section id="tab-flashcards" class="tab-content">
       <div class="flashcard-wrapper" onclick="flipCard()">
         <div id="flashcard" class="flashcard">
           <div class="card-face card-front">
             <h2 id="fcSamala" class="samala-word">---</h2>
-            <p>(Click to reveal meaning)</p>
+            <p>(Click or tap to flip)</p>
           </div>
           <div class="card-face card-back">
             <h2 id="fcEnglish" style="color: var(--primary);">---</h2>
-            <p>English Translation</p>
+            <p id="fcNotes" class="word-notes">---</p>
           </div>
         </div>
       </div>
       <div class="card-controls">
         <button class="btn" onclick="prevCard()">Previous</button>
-        <span id="fcCounter" style="align-self: center; font-weight: 500;">1 / 1</span>
+        <span id="fcCounter" style="align-self: center; font-weight: 600;">1 / 1</span>
         <button class="btn" onclick="nextCard()">Next</button>
+        <button class="btn" style="background:#64748b;" onclick="shuffleCards()">Shuffle</button>
       </div>
     </section>
 
-    <!-- 3. Quiz View -->
+    <!-- QUIZ VIEW -->
     <section id="tab-quiz" class="tab-content">
       <div class="quiz-box">
-        <p style="color: var(--text-muted); font-size: 0.9rem;">What does this word mean?</p>
-        <h2 id="quizWord" class="samala-word" style="margin: 0.5rem 0 1rem; font-size: 2rem;">---</h2>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">What does this Sʰamala word or phrase mean?</p>
+        <h2 id="quizWord" class="samala-word" style="margin: 0.75rem 0 1.25rem; font-size: 2rem;">---</h2>
         <div id="quizOptions" class="quiz-options"></div>
         <div id="quizFeedback" class="quiz-feedback"></div>
-        <button id="nextQuizBtn" class="btn" style="margin-top: 1rem; display: none;" onclick="setupQuizQuestion()">Next Question</button>
+        <button id="nextQuizBtn" class="btn" style="margin-top: 1.2rem; display: none;" onclick="setupQuizQuestion()">Next Question</button>
       </div>
     </section>
   </div>
 
   <script>
-    // Starter Samala Chumash dataset (You can add as many words as you want here!)
+    // Master Dictionary Extracted from the Applegate 2026 Manuscript
     const vocabulary = [
-      { samala: "Swil a huču a k’ap", english: "There is a dog at my house" },
-      { samala: "Swil a k’apap", english: "I have a ball" },
-      { samala: "‘insil a k’aqš’uqa’y", english: "I don't have a fork" },
-      { samala: "‘insil a psuk’u", english: "You don’t have respect" },
-      { samala: "Noswil ê ha ‘aqš’ɨnɨhɨčmu’", english: "Will there be lunch?" },
-      { samala: "Šwiliwaš a ‘o’", english: "There was water" },
-      { samala: "Nokɨlɨk’ɨn a k’iti’ ha kša palpat a p’ap", english: "I will stay here meanwhile you run to your house" },
-      { samala: "Kpuxš ha’ ‘inikta’may a nɨwɨš", english: "I study so that I don’t forget the song" },
-      { samala: "Nokaxikum hak’u paxikum", english: "I will dance if you dance" },
-      { samala: "Kaqničʰolin hikʰu ‘nipaqničʰolit", english: "I like you but you don’t like me" },
-      { samala: "‘inikna’nawaš hini saxikum a xus", english: "I didn’t go when the bear danced" },
-      { samala: "Nokesqen ‘itwa kikʰɨl a kaqsisin", english: "I will ask before I get mad" },
-      { samala: "Nokeqwelin a pstuk kačʰa ksuk’uwin", english: "I will make you a bowl because I respect you" },
-      { samala: "Nokna’n ‘iyapa no’nikatikat", english: "I will go even though I don’t need to" },
-      { samala: "Kexpeč kuwa piwe’", english: "I sing until you all sleep" },
-      { samala: "Kištɨ’awaš kɨm kaqsisinawaš", english: "I found out and then I was mad" },
-      { samala: "Nokatɨlin ma’li kitaxsɨn", english: "I will meet you after I find out" },
-      { samala: "Siyalpat moq siyitaq a taxama", english: "They run when they hear a skunk" },
-      { samala: "Kaqtikat a kaxtɨš a cweq na nɨ", english: "I need to buy herb and lighter" },
-      { samala: "P’oyonus hak’u k’oyonin", english: "You help him or I help you" },
-      { samala: "Nokašɨw pali pɨlɨk’ɨn", english: "I will speak as soon as you sit down" },
-      { samala: "Nokmiš wa kitaxsɨn", english: "I will cry if and when I find out" }
-    ];
-
-    // Navigation Tabs
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-      document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
-      event.target.classList.add('active');
-      if (tabId === 'flashcards') renderFlashcard();
-      if (tabId === 'quiz') setupQuizQuestion();
-    }
-
-    // Dictionary Render & Search
-    function renderDictionary(data) {
-      const list = document.getElementById('wordList');
-      list.innerHTML = '';
-      data.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'word-card';
-        div.innerHTML = `
-          <span class="samala-word">${item.samala}</span>
-          <span class="english-word">${item.english}</span>
-        `;
-        list.appendChild(div);
-      });
-    }
-
-    function filterWords() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      const filtered = vocabulary.filter(w => 
-        w.samala.toLowerCase().includes(q) || w.english.toLowerCase().includes(q)
-      );
-      renderDictionary(filtered);
-    }
-
-    // Flashcard Logic
-    let currentCardIndex = 0;
-    let isFlipped = false;
-
-    function renderFlashcard() {
-      isFlipped = false;
-      document.getElementById('flashcard').classList.remove('flipped');
-      const item = vocabulary[currentCardIndex];
-      document.getElementById('fcSamala').textContent = item.samala;
-      document.getElementById('fcEnglish').textContent = item.english;
-      document.getElementById('fcCounter').textContent = `${currentCardIndex + 1} / ${vocabulary.length}`;
-    }
-
-    function flipCard() {
-      isFlipped = !isFlipped;
-      document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
-    }
-
-    function nextCard() {
-      currentCardIndex = (currentCardIndex + 1) % vocabulary.length;
-      renderFlashcard();
-    }
-
-    function prevCard() {
-      currentCardIndex = (currentCardIndex - 1 + vocabulary.length) % vocabulary.length;
-      renderFlashcard();
-    }
-
-    // Quiz Logic
-    function setupQuizQuestion() {
-      const feedback = document.getElementById('quizFeedback');
-      const nextBtn = document.getElementById('nextQuizBtn');
-      feedback.textContent = '';
-      nextBtn.style.display = 'none';
-
-      const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
-      document.getElementById('quizWord').textContent = correct.samala;
-
-      // Pick 3 random distractor answers
-      let options = [correct.english];
-      while (options.length < 4 && options.length < vocabulary.length) {
-        const rand = vocabulary[Math.floor(Math.random() * vocabulary.length)].english;
-        if (!options.includes(rand)) options.push(rand);
-      }
-      options.sort(() => Math.random() - 0.5);
-
-      const optionsContainer = document.getElementById('quizOptions');
-      optionsContainer.innerHTML = '';
-
-      options.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'quiz-option';
-        btn.textContent = opt;
-        btn.onclick = () => {
-          if (opt === correct.english) {
-            feedback.textContent = "Correct! Kaqin' (Good)!";
-            feedback.style.color = "#16a34a";
-          } else {
-            feedback.textContent = `Not quite. Correct answer: ${correct.english}`;
-            feedback.style.color = "#dc2626";
-          }
-          nextBtn.style.display = 'inline-block';
-        };
-        optionsContainer.appendChild(btn);
-      });
-    }
-
-    // Initial load
-    renderDictionary(vocabulary);
-  </script>
-</body>
-</html>
+      // A entries
+      { samala: "ʼaʼ", english: "crow", notes: "noun" },
+      { samala: "ackaw", english: "to make a mistake, error, be mistak
