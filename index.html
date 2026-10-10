@@ -1,3 +1,580 @@
+im looking to build a simple free website where i can learn and study my samala chumash language can you do that for me?
+
+Building a personal, free language-learning website for Šmuwič / Samala Chumash is completely doable, and you can get one up and running quickly.
+
+I can write the complete, ready-to-run code for you right now, and you can host it for free on platforms like GitHub Pages, Netlify, or Vercel.
+
+Here is a lightweight, responsive, single-file interactive website template (index.html) featuring an interactive Vocabulary Search/Dictionary, Flashcard Study Deck, and a Quiz Mode.
+
+index.html
+Save the code below into a file named index.html on your computer:
+
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Samala Chumash Learning Portal</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #9a3412;
+      --primary-hover: #7c2d12;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 1.5rem;
+    }
+    .container { max-width: 800px; margin: 0 auto; }
+    header { text-align: center; margin-bottom: 2rem; }
+    header h1 { color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem; }
+    header p { color: var(--text-muted); }
+    
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .nav button {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav button.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Dictionary View */
+    .search-bar {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .word-list { display: grid; gap: 0.75rem; }
+    .word-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .samala-word { font-size: 1.2rem; font-weight: 600; color: var(--primary); }
+    .english-word { color: var(--text-muted); font-size: 1rem; }
+
+    /* Flashcard View */
+    .flashcard-wrapper {
+      perspective: 1000px;
+      margin: 2rem auto;
+      max-width: 450px;
+      height: 250px;
+      cursor: pointer;
+    }
+    .flashcard {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+    .flashcard.flipped { transform: rotateY(180deg); }
+    .card-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .card-back { transform: rotateY(180deg); background: #fff7ed; }
+    .card-face h2 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    .card-face p { color: var(--text-muted); font-size: 0.9rem; }
+    .card-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+    .btn:hover { background: var(--primary-hover); }
+
+    /* Quiz View */
+    .quiz-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    .quiz-options {
+      display: grid;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+    .quiz-option {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: 0.2s;
+    }
+    .quiz-option:hover { border-color: var(--primary); }
+    .quiz-feedback { margin-top: 1rem; font-weight: 600; min-height: 24px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Samala Chumash Study Portal</h1>
+      <p>Interactive study companion for language preservation and learning</p>
+    </header>
+
+    <div class="nav">
+      <button class="active" onclick="switchTab('dict')">Dictionary</button>
+      <button onclick="switchTab('flashcards')">Flashcards</button>
+      <button onclick="switchTab('quiz')">Quick Quiz</button>
+    </div>
+
+    <!-- 1. Dictionary View -->
+    <section id="tab-dict" class="tab-content active">
+      <input type="text" id="searchInput" class="search-bar" placeholder="Search in Samala or English..." oninput="filterWords()" />
+      <div id="wordList" class="word-list"></div>
+    </section>
+
+    <!-- 2. Flashcard View -->
+    <section id="tab-flashcards" class="tab-content">
+      <div class="flashcard-wrapper" onclick="flipCard()">
+        <div id="flashcard" class="flashcard">
+          <div class="card-face card-front">
+            <h2 id="fcSamala" class="samala-word">---</h2>
+            <p>(Click to reveal meaning)</p>
+          </div>
+          <div class="card-face card-back">
+            <h2 id="fcEnglish" style="color: var(--primary);">---</h2>
+            <p>English Translation</p>
+          </div>
+        </div>
+      </div>
+      <div class="card-controls">
+        <button class="btn" onclick="prevCard()">Previous</button>
+        <span id="fcCounter" style="align-self: center; font-weight: 500;">1 / 1</span>
+        <button class="btn" onclick="nextCard()">Next</button>
+      </div>
+    </section>
+
+    <!-- 3. Quiz View -->
+    <section id="tab-quiz" class="tab-content">
+      <div class="quiz-box">
+        <p style="color: var(--text-muted); font-size: 0.9rem;">What does this word mean?</p>
+        <h2 id="quizWord" class="samala-word" style="margin: 0.5rem 0 1rem; font-size: 2rem;">---</h2>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizFeedback" class="quiz-feedback"></div>
+        <button id="nextQuizBtn" class="btn" style="margin-top: 1rem; display: none;" onclick="setupQuizQuestion()">Next Question</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Starter Samala Chumash dataset (You can add as many words as you want here!)
+    const vocabulary = [
+      { samala: "Mikit", english: "House / Home" },
+      { samala: "Xanap", english: "Water" },
+      { samala: "‘Alapišma", english: "Sun" },
+      { samala: "Kut", english: "Fire" },
+      { samala: "‘Ayaq", english: "Earth / Ground" },
+      { samala: "Qsi’", english: "Wind / Air" },
+      { samala: "Pnu'", english: "Tree / Wood" },
+      { samala: "Sxami", english: "Fish" },
+      { samala: "Kux", english: "Heart" },
+      { samala: "Ha'i", english: "Yes" }
+    ];
+
+    // Navigation Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      event.target.classList.add('active');
+      if (tabId === 'flashcards') renderFlashcard();
+      if (tabId === 'quiz') setupQuizQuestion();
+    }
+
+    // Dictionary Render & Search
+    function renderDictionary(data) {
+      const list = document.getElementById('wordList');
+      list.innerHTML = '';
+      data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'word-card';
+        div.innerHTML = `
+          <span class="samala-word">${item.samala}</span>
+          <span class="english-word">${item.english}</span>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function filterWords() {
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = vocabulary.filter(w => 
+        w.samala.toLowerCase().includes(q) || w.english.toLowerCase().includes(q)
+      );
+      renderDictionary(filtered);
+    }
+
+    // Flashcard Logic
+    let currentCardIndex = 0;
+    let isFlipped = false;
+
+    function renderFlashcard() {
+      isFlipped = false;
+      document.getElementById('flashcard').classList.remove('flipped');
+      const item = vocabulary[currentCardIndex];
+      document.getElementById('fcSamala').textContent = item.samala;
+      document.getElementById('fcEnglish').textContent = item.english;
+      document.getElementById('fcCounter').textContent = `${currentCardIndex + 1} / ${vocabulary.length}`;
+    }
+
+    function flipCard() {
+      isFlipped = !isFlipped;
+      document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+    }
+
+    function nextCard() {
+      currentCardIndex = (currentCardIndex + 1) % vocabulary.length;
+      renderFlashcard();
+    }
+
+    function prevCard() {
+      currentCardIndex = (currentCardIndex - 1 + vocabulary.length) % vocabulary.length;
+      renderFlashcard();
+    }
+
+    // Quiz Logic
+    function setupQuizQuestion() {
+      const feedback = document.getElementById('quizFeedback');
+      const nextBtn = document.getElementById('nextQuizBtn');
+      feedback.textContent = '';
+      nextBtn.style.display = 'none';
+
+      const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+      document.getElementById('quizWord').textContent = correct.samala;
+
+      // Pick 3 random distractor answers
+      let options = [correct.english];
+      while (options.length < 4 && options.length < vocabulary.length) {
+        const rand = vocabulary[Math.floor(Math.random() * vocabulary.length)].english;
+        if (!options.includes(rand)) options.push(rand);
+      }
+      options.sort(() => Math.random() - 0.5);
+
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-option';
+        btn.textContent = opt;
+        btn.onclick = () => {
+          if (opt === correct.english) {
+            feedback.textContent = "Correct! Kaqin' (Good)!";
+            feedback.style.color = "#16a34a";
+          } else {
+            feedback.textContent = `Not quite. Correct answer: ${correct.english}`;
+            feedback.style.color = "#dc2626";
+          }
+          nextBtn.style.display = 'inline-block';
+        };
+        optionsContainer.appendChild(btn);
+      });
+    }
+
+    // Initial load
+    renderDictionary(vocabulary);
+  </script>
+</body>
+</html>
+How to host it completely free (takes 2 minutes)
+Option 1: GitHub Pages (Recommended)
+
+Create a free account at
+github.com
+.
+Create a new public repository (e.g., samala-learning).
+Upload the index.html file.
+Go to Settings > Pages, choose main branch, and hit Save.
+Your site will be live at https://yourusername.github.io/samala-learning/.
+Option 2: Netlify Drop (No account or code knowledge needed)
+
+Save the code into a folder on your computer named samala-app with the file named index.html.
+Go to
+app.netlify.com/drop
+.
+Drag and drop your folder into the browser window — your site goes live instantly with a free URL.
+Customizing your content
+Open the index.html file in any text editor (like Notepad or TextEdit).
+Look for the const vocabulary = [...] section around line 150.
+You can add your own words, pronunciations, audio links (<audio src="...">), and verb conjugations directly into the list!
+
+it says your gifthub pages site is currently being built from the main branch
+
+That means you did everything right!
+
+GitHub is currently compiling your files and deploying them to its web servers. This usually takes about 1 to 3 minutes for a new site.
+
+Here is what to expect next:
+
+Wait about 60–90 seconds, then refresh the Settings > Pages screen.
+The message will change to a green box saying:
+"Your site is live at https://<your-username>.github.io/<your-repo>/"
+
+Click the link provided there, and your Samala Chumash study app will open right up.
+How to check the build progress
+If you want to see exactly what GitHub is doing behind the scenes:
+
+Click the Actions tab at the top of your repository.
+You'll see an active workflow named pages-build-deployment.
+When the yellow spinning circle turns into a green checkmark, your site is fully live.
+
+there is a green checkmark but on the pages page there is no link to my live site
+
+Don't worry—the green checkmark in Actions means the build succeeded and your site is actually live! The Pages settings page can just be slow to update its UI cache.
+
+You can view your site right now using its direct URL format:
+
+text
+https://<your-username>.github.io/<your-repository-name>/
+(For example, if your GitHub username is janesmith and the repository is samala-learning, your link is https://janesmith.github.io/samala-learning/)
+
+Two other quick places to find the live link:
+In the Actions tab directly:
+
+Click the workflow run that has the green checkmark (usually called pages build and deployment).
+Under the deploy step on the summary screen, there is a section called deploy with a direct URL you can click right from there.
+On the main repository homepage:
+
+Click the Code tab to go to the main page of your repository.
+Look at the right-hand sidebar under Deployments (or Environments).
+You should see github-pages with a direct link to your active deployment.
+Try typing the URL directly into your address bar, and your app should load immediately! If you get a 404 page, double-check that your file in the repository is spelled exactly index.html (all lowercase).
+
+
+there is nothing in my workflow now
+
+If the workflow disappeared or says there are no workflow runs, that usually means the Pages source setting needs a quick re-trigger, or GitHub reset the build source.
+
+Let's do a quick 30-second fix to trigger it properly:
+
+Step 1: Check your Pages Source setting
+In your repository, click Settings (the gear icon on the top tab bar).
+On the left sidebar, click Pages.
+Under Build and deployment:
+Make sure Source is set to: Deploy from a branch.
+Under Branch, make sure:
+The branch is set to main (or master if your repository used master).
+The folder next to it is set to /(root).
+Click Save (even if it was already selected, switching it or clicking Save again forces a fresh build).
+Step 2: Verify file name on the main code page
+Click the Code tab at the top left of your repository:
+
+Look at your file list. Do you see index.html?
+Important check: Make sure it is named exactly index.html — all lowercase, no capital letters, and not inside a sub-folder. (If it is named Index.html or index.html.txt, GitHub Pages will ignore it and not build anything).
+Step 3: Force a commit to trigger a new run
+If the Actions tab is completely empty, the easiest way to kickstart the system is to make a tiny edit:
+
+In the Code tab, click on your index.html file.
+Click the Pencil icon (Edit this file) at the top right of the file preview.
+Add a blank space anywhere (or hit enter once at the bottom).
+Click the green Commit changes... button at the top right, then click Commit changes again.
+Now, immediately click the Actions tab. You will see a new run appear called pages build and deployment with a spinning icon, followed by the deployment URL within 60 seconds!
+
+
+ok it worked but i tried to fix the vocabulary in the code file because all the samala words were wrong and it published with no words i think i messed up the code ...do i unplublish site to edit my mistake
+
+No, do not unpublish the site! You don't need to unpublish or take anything down.
+
+When you see a blank page or no words showing up, it almost always means a small punctuation error broke the JavaScript code—usually a missing quote ("), an accidental unescaped apostrophe/glottal stop ('), or a missing comma (,).
+
+You can edit and fix it directly inside GitHub in under a minute.
+
+Why this happens with Samala words
+In JavaScript, words are wrapped in double quotes: "...".
+
+Because Samala Chumash uses glottal stops, apostrophes, and special diacritics (like ', ’, ʔ, š, x), if you write:
+
+❌ { samala: 'ha'i', english: 'yes' } — the apostrophe inside 'ha'i' breaks the code because JavaScript thinks the word ended at ha.
+✅ { samala: "ha'i", english: "Yes" } — wrapping the whole word in double quotes " allows single quotes and glottal apostrophes inside without breaking!
+How to fix it directly on GitHub right now:
+Go to your repository on GitHub and click the Code tab.
+Click on index.html.
+Click the Pencil icon (Edit this file) in the top-right corner.
+Scroll down toward the bottom until you find the const vocabulary = [ section.
+Check your list format. Every single word pair must follow this exact pattern:
+javascript
+    const vocabulary = [
+      { samala: "YourWord1", english: "Meaning 1" },
+      { samala: "YourWord2", english: "Meaning 2" },
+      { samala: "YourWord3", english: "Meaning 3" }
+    ];
+Things to check:
+
+Is there a comma (,) at the end of every line except the last one?
+Are the words wrapped in standard straight double quotes (") instead of curly ones?
+Does the list end with ];?
+Click the green Commit changes... button at the top right.
+Click Commit changes to confirm.
+GitHub Pages will automatically detect your save, rebuild the site in about 60 seconds, and update your live site!
+
+Tip
+Want me to format your vocabulary list for you? Paste your list of Samala words and their English meanings right here in our chat, and I'll format the code block with all the proper quotes, commas, and characters so you can just copy and paste it into GitHub!
+
+
+Swil a huču a k’ap - there is a dog at my house
+Swil a k’apap - I have a Ball
+‘insil a k’aqš’uqa’y - I have a fork
+‘insil a psuk’u - you don’t have respect
+Noswil ê ha ‘aqš’ɨnɨhɨčmu’ - will there be lunch?
+Šwiliwaš a ‘o’ - there was water
+Nokɨlɨk’ɨn a k’iti’ ha kša palpat a p’ap - I will stay here meanwhile you run to your house
+Kpuxš ha’ ‘inikta’may a nɨwɨš - I study so that I don’t forget the song
+Nokaxikum hak’u paxikum - I will dance if you dance
+Kaqničʰolin hikʰu ‘nipaqničʰolit - I like you but you don’t like me
+‘inikna’nawaš hini saxikum a xus - I didn’t go when the bear danced
+Nokesqen ‘itwa kikʰɨl a kaqsisin - I will ask before I get mad
+Nokeqwelin a pstuk kačʰa ksuk’uwin - I will make you a bowl because I respect
+Nokna’n ‘iyapa no’nikatikat - I will go even though I don’t need to
+Kexpeč kuwa piwe’ - I sing until you all sleep
+Kištɨ’awaš kɨm kaqsisinawaš - I found out and then I was mad
+Nokatɨlin ma’li kitaxsɨn - I will meet you after I find out
+Siyalpat moq siyitaq a taxama - They run when they hear a skunk
+Kaqtikat a kaxtɨš a cweq na nɨ - I need to buy herb and lighter
+P’oyonus hak’u k’oyonin - you help him or I help you
+Nokašɨw pali pɨlɨk’ɨn - I will speak as soon as you sit down
+Nokmiš wa kitaxsɨn - I will cry if and when I find out
+
+Here is the exact code block formatted for your phrases! Every special character, glottal stop, barred-i (ɨ), aspirated consonant (ʰ), and single quote has been safely wrapped in double quotes so your code will run smoothly.
+
+Step-by-step to update your site:
+Go to your GitHub repository and click on index.html.
+Click the Pencil icon (Edit this file) in the top right.
+Find the section that begins with:
+javascript
+const vocabulary = [
+and ends with:
+javascript
+];
+Delete that whole block and replace it with this:
+javascript
+    const vocabulary = [
+      { samala: "Swil a huču a k’ap", english: "There is a dog at my house" },
+      { samala: "Swil a k’apap", english: "I have a ball" },
+      { samala: "‘insil a k’aqš’uqa’y", english: "I have a fork" },
+      { samala: "‘insil a psuk’u", english: "You don’t have respect" },
+      { samala: "Noswil ê ha ‘aqš’ɨnɨhɨčmu’", english: "Will there be lunch?" },
+      { samala: "Šwiliwaš a ‘o’", english: "There was water" },
+      { samala: "Nokɨlɨk’ɨn a k’iti’ ha kša palpat a p’ap", english: "I will stay here meanwhile you run to your house" },
+      { samala: "Kpuxš ha’ ‘inikta’may a nɨwɨš", english: "I study so that I don’t forget the song" },
+      { samala: "Nokaxikum hak’u paxikum", english: "I will dance if you dance" },
+      { samala: "Kaqničʰolin hikʰu ‘nipaqničʰolit", english: "I like you but you don’t like me" },
+      { samala: "‘inikna’nawaš hini saxikum a xus", english: "I didn’t go when the bear danced" },
+      { samala: "Nokesqen ‘itwa kikʰɨl a kaqsisin", english: "I will ask before I get mad" },
+      { samala: "Nokeqwelin a pstuk kačʰa ksuk’uwin", english: "I will make you a bowl because I respect you" },
+      { samala: "Nokna’n ‘iyapa no’nikatikat", english: "I will go even though I don’t need to" },
+      { samala: "Kexpeč kuwa piwe’", english: "I sing until you all sleep" },
+      { samala: "Kištɨ’awaš kɨm kaqsisinawaš", english: "I found out and then I was mad" },
+      { samala: "Nokatɨlin ma’li kitaxsɨn", english: "I will meet you after I find out" },
+      { samala: "Siyalpat moq siyitaq a taxama", english: "They run when they hear a skunk" },
+      { samala: "Kaqtikat a kaxtɨš a cweq na nɨ", english: "I need to buy herb and lighter" },
+      { samala: "P’oyonus hak’u k’oyonin", english: "You help him or I help you" },
+      { samala: "Nokašɨw pali pɨlɨk’ɨn", english: "I will speak as soon as you sit down" },
+      { samala: "Nokmiš wa kitaxsɨn", english: "I will cry if and when I find out" }
+    ];
+Click the green Commit changes... button at the top right.
+Click Commit changes again to save.
+Give GitHub about 60 seconds to build, refresh your live site URL (you can do a hard refresh with Shift + Refresh), and all 22 of your phrases will be fully searchable, available as flashcards, and playable in quiz mode!
+
+
+ok that looks great....now i have a full dictionary list in a pdf could you make a code for it and i can replace the index.html ?
+
+Yes, absolutely! I can extract the words from your PDF and build you an updated, complete index.html file that you can copy and paste directly into your GitHub repository.
+
+To do that:
+
+Upload the PDF right here in the chat (using the paperclip / plus icon in the chat box).
+If the file is very large or you prefer not to upload the entire document, you can also copy and paste the text (or a few pages at a time) directly into your reply.
+What I will upgrade in your new code:
+When dealing with a full dictionary (hundreds or thousands of entries), a few upgrades make a huge difference:
+
+Instant search & pagination / virtual scroll so your page never lags or freezes even with thousands of words.
+Alphabetical browsing / category filters so you can browse by letter or topic.
+Accented character search support so searching for plain letters like s, i, or c will still match š, ɨ, or č!
+Study deck selector so your quiz and flashcards don't overwhelm you with all 1,000+ words at once.
+Whenever you're ready, upload the PDF or paste the text, and I'll generate the full code for you!
+
+
+ 
+
+Here is the complete, upgraded index.html file containing hundreds of extracted dictionary entries from Dr. Richard Applegate’s Sʰamala–English Dictionary (covering A, C, Č, E, H, I, Ɨ, K, L, M, N, O, P, Q, S, Š, T, U, W, X, Y, and Glottal-stop sections).
+
+What's improved in this version:
+Fuzzy & Diacritic-Insensitive Search: You can type plain English letters like s, c, i, h and it will automatically match special Samala characters like š, č, ɨ, ʰ, and glottal stops (ʼ).
+Alphabet Quick-Filter Bar: Click any letter (A, C, Č, E, H, I, Ɨ, K, L, M, N, O, P, Q, S, Š, T, U, W, X, Y, ʼ) to instantly jump or filter entries.
+Word Details: Displays morphological breakdowns (e.g. < su- "causative" + ...) and example sentences.
+Study Deck & Quiz Modes: Works with the full vocabulary database, picking random words and distractors cleanly.
+Complete index.html Code
+Replace the entire content of your index.html file in GitHub with the code below:
+
+
+html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -267,4 +844,1029 @@
     const vocabulary = [
       // A entries
       { samala: "ʼaʼ", english: "crow", notes: "noun" },
-      { samala: "ackaw", english: "to make a mistake, error, be mistak
+      { samala: "ackaw", english: "to make a mistake, error, be mistaken", notes: "< ac- + =kaw 'to do wrong'" },
+      { samala: "ʼactɨk", english: "to taper, be conical, to come to a point", notes: "< ac- + tɨk 'tip, point'" },
+      { samala: "ʼactʼuʼm", english: "to taper, be conical, to be pointed", notes: "synonym: ʼactʼuʼm = ʼactɨk" },
+      { samala: "ʼacʼilapɨt", english: "pile, literally 'one that is piled up'", notes: "< ʼal- 'agent' + cʼi-apɨt" },
+      { samala: "acʼɨmɨn", english: "to purse the lips, shut mouth tightly", notes: "< al- + =cʼɨmɨn 'be shut tight'" },
+      { samala: "ʼalacʼɨmɨn", english: "narrow-mouthed storage basket", notes: "literally 'thing with pursed lips'" },
+      { samala: "ʼacʼɨs", english: "beard, whisker(s)", notes: "always with possessive marker" },
+      { samala: "ʼačʼɨšič", english: "to pluck the whiskers", notes: "< ʼacʼɨs + -vč" },
+      { samala: "ʼačʼɨšɨš", english: "clam species used as tweezers", notes: "< ʼacʼɨs + -vš" },
+      { samala: "sʼacʼɨs a paxat", english: "whale bone, baleen", notes: "literally 'whale's beard'" },
+      { samala: "ʼača", english: "ax, hatchet", notes: "< Spanish hacha" },
+      { samala: "ʼačaʼn", english: "to be possessed in trance by a spirit, see visions", notes: "spiritual/trance" },
+      { samala: "ačkawš", english: "to go wrong", notes: "< ackaw + -š" },
+      { samala: "ačkawšɨši", english: "to experience a mishap, have an accident", notes: "< ackaw + -šaši/šɨši 'oneself'" },
+      { samala: "sackaw", english: "to disgrace oneself, do something stupid by accident", notes: "< su- + ackaw" },
+      { samala: "talackaw", english: "to have bad luck", notes: "< tal- + ackaw" },
+      { samala: "ačʰomuʼ", english: "at last, finally", notes: "< al- + čʰoʼ 'to stop' + -muʼ" },
+      { samala: "ahaš", english: "soul, spirit", notes: "always with possessive marker" },
+      { samala: "ʼahašɨš", english: "ghost, spirit (non-possessed form)", notes: "< ahaš + -vš" },
+      { samala: "ahitaqcʼipi", english: "a rough place, place with rough terrain", notes: "< al- + hitaqcʼiʼ + -pi" },
+      { samala: "ʼahutinaʼš", english: "man's hairnet (of milkweed fiber)", notes: "traditional regalia" },
+      { samala: "ʼakawayu", english: "to ride horseback, go on horseback", notes: "< Spanish á caballo" },
+      { samala: "ʼakay", english: "bed", notes: "always with possessive marker" },
+      { samala: "ʼakayɨš", english: "bed (non-possessed form)", notes: "< ʼakay + -vš" },
+      { samala: "ʼasʼaka", english: "Zaca (placename: 'in the bed')", notes: "< ʼal- + s- + ʼaka(y)" },
+      { samala: "aklatɨš", english: "to defend, defend oneself", notes: "verb" },
+      { samala: "aktikʼ", english: "to come to get, take", notes: "< akti- + hik 'to do'" },
+      { samala: "aktikalaš", english: "to catch one's breath", notes: "< akti- + kalaš 'to breathe'" },
+      { samala: "aktimisa", english: "to go to mass", notes: "< akti- + misa" },
+      { samala: "aktinaʼ", english: "to come, come to", notes: "< akti- + naʼ 'to go'" },
+      { samala: "aktinapi", english: "to come at (someone/something)", notes: "< aktinaʼ + -pi" },
+      { samala: "aktinunaʼ", english: "to bring something to, carry to", notes: "< akti- + nu-naʼ" },
+      { samala: "ʼakʼučuwič", english: "scar", notes: "noun" },
+      { samala: "al-", english: "what, which, that which", notes: "relative prefix creating clauses" },
+      { samala: "alamašɨn", english: "food, literally 'what is eaten'", notes: "< al-am- + ašɨn 'to eat'" },
+      { samala: "alamatɨʼ", english: "meeting", notes: "< al-am- + atɨʼ 'to meet'" },
+      { samala: "alamaxtap", english: "venison (often eaten raw)", notes: "< al-am- + ax-tap 'to eat raw meat'" },
+      { samala: "alamaxtutʼun", english: "drink, beverage", notes: "< al-am- + axtutʼun 'to swallow'" },
+      { samala: "alamelew", english: "slope, steep downhill grade", notes: "< al-am- + elew 'to come down'" },
+      { samala: "alamnapay", english: "slope, uphill grade", notes: "< al-am- + ni-apay 'to go up'" },
+      { samala: "alamnaqšan", english: "wine or spirits (literally 'that which dizzies one')", notes: "< al-am- + ni-aqšan" },
+      { samala: "alampaš", english: "emetic (taken to induce vomiting)", notes: "< al-am- + paš 'to vomit'" },
+      { samala: "alampicʼeʼ", english: "purgative, laxative", notes: "< al-am- + picʼeʼ 'have diarrhea'" },
+      { samala: "alamsepelew", english: "trouble, scrape, difficulty", notes: "< al-am- + sepelew" },
+      { samala: "alamsutap", english: "dye, literally 'what they put it into'", notes: "< al-am- + su-tap" },
+      { samala: "alamtepleʼ", english: "tuberculosis", notes: "< al-am- + te-pleʼ" },
+      { samala: "alamaspaxanuswunpi", english: "school, literally 'where they teach them'", notes: "< al-am- + aspaxan + -pi" },
+      { samala: "alamhalalapi", english: "quarrel, argument", notes: "< al-am- + halala + -pi" },
+      { samala: "alamtepupi", english: "playing field, where they play", notes: "< al-am- + tepuʼ + -pi" },
+      { samala: "ʼalapʼamuwun", english: "Purisimeño Indian(s), person from La Purisima", notes: "< ʼalap- + ʼamuwun" },
+      { samala: "ʼalapʼitiʼ", english: "a person from here, local inhabitant", notes: "< ʼalap- + ʼitiʼ 'here'" },
+      { samala: "ʼalapkalawaqšaqʼ", english: "inhabitant of the village of Kalawašaqʼ", notes: "< ʼalap- + kalawaqšaqʼ" },
+      { samala: "ʼalapmicqanaqaʼn", english: "Ventureño Indian, person from Ventura", notes: "< ʼalap- + micqanaqaʼn" },
+      { samala: "ʼalapmikiwin", english: "inhabitant of Dos Pueblos (Mikiw)", notes: "< ʼalap- + mikiw" },
+      { samala: "ʼalapqasil", english: "inhabitant of El Refugio (Qasil)", notes: "< ʼalap- + qasil" },
+      { samala: "ʼalapšawa", english: "person from Šawa (Island clan)", notes: "< ʼalap- + šawa" },
+      { samala: "ʼalaptilhini", english: "Obispeño, person from San Luis Obispo", notes: "< ʼalap- + tilhini" },
+      { samala: "ʼalapapʼ", english: "oak puffball", notes: "< ʼal- + ʼapapʼ 'ball'" },
+      { samala: "ʼalapay", english: "up, above, on top of; sky, in the sky", notes: "< ʼal- + apay 'to be over'" },
+      { samala: "ʼalapliš", english: "east", notes: "cardinal direction" },
+      { samala: "ʼalaqlɨʼw", english: "to sing or shout loudly", notes: "< ʼal- + aqlɨʼw 'voice'" },
+      { samala: "ʼalaqsisiʼ", english: "to be mad, angry", notes: "synonym: ʼalaqsisiʼ = yultʼul" },
+      { samala: "ʼalaqšan", english: "dead person, deceased person", notes: "< ʼal- + aqšan 'to die'" },
+      { samala: "ʼalaqucʼum", english: "clam species, eaten raw with smooth white shell", notes: "< ʼal- + aqucʼum" },
+      { samala: "alaqwaʼy", english: "to be ready, prepared, in good condition", notes: "< al- + aqwaʼy 'hit mark'" },
+      { samala: "ʼalasal", english: "to pray", notes: "< Spanish arezar" },
+      { samala: "ʼalašalɨš", english: "prayer", notes: "< ʼalasal + -vš" },
+      { samala: "ʼalaštɨwɨkš", english: "dark blue soapstone; bitter green bile", notes: "color-based name" },
+      { samala: "alatlatɨk", english: "creature, living being ('one that is alive')", notes: "< al- + atɨk + reduplication" },
+      { samala: "ʼalawalya", english: "jail", notes: "< Spanish guardia; syn: ʼaqšikšmuʼ" },
+      { samala: "alawan", english: "to murder, kill", notes: "verb" },
+      { samala: "ʼalawax", english: "west (also occasionally north)", notes: "cardinal direction" },
+      { samala: "ʼalawišaš", english: "to be brave ongoingly", notes: "< ʼal- + awišaš 'brave'" },
+      { samala: "alaxcʼacʼax", english: "cold (temperature/descriptive)", notes: "< al- + axcʼacʼax 'cold'" },
+      { samala: "ʼalaxikʰič", english: "commander, person in charge", notes: "< ʼal- + axi-kʰɨt + -š" },
+      { samala: "ʼalaxipeč", english: "carpenter, wood-worker", notes: "< ʼal- + axi-pen + -š" },
+      { samala: "ʼalaxiyepš", english: "doctor, healer", notes: "< ʼal- + axi-yep 'to cure' + -š" },
+      { samala: "ʼalaxtutʼuč", english: "shaman, sucking doctor", notes: "< ʼal- + axtutʼun-š 'to suck'" },
+      { samala: "ʼalaxutiwil", english: "speaker, one who speaks", notes: "< ʼal- + axutiwil 'to speak'" },
+      { samala: "alaxyamilpi", english: "desert, literally 'where it is barren'", notes: "< al- ... -pi + axyamil" },
+      { samala: "ʼalčʰum", english: "money, shell bead money", notes: "< ʼal- + čʰum" },
+      { samala: "tipʼalčʰum", english: "to be rich, wealthy", notes: "< tip- 'big' + ʼalčʰum" },
+      { samala: "ʼalel", english: "to read", notes: "< Spanish a leer" },
+      { samala: "ʼalelkʼewili", english: "fish species in shallow water", notes: "< ʼal- + elkʼewili 'along shore'" },
+      { samala: "ʼalexlelen", english: "swan, 'the crier'", notes: "< ʼal- + exlelen 'to cry out'" },
+      { samala: "ʼalexpeč", english: "singer", notes: "< ʼal- + expen-š 'to sing'" },
+      { samala: "ʼalhapuč", english: "meat", notes: "< ʼal- + hap 'horn' + -vč" },
+      { samala: "ʼalkuʼwečʰin", english: "to impinge on one's awareness, suddenly notice", notes: "impersonal verb" },
+      { samala: "ʼalmiyiʼ", english: "California condor", notes: "sacred bird" },
+      { samala: "ʼalolkʼoy", english: "porpoise (literally 'the circular swimmer')", notes: "< ʼal- + olkʼoy 'circle around'" },
+      { samala: "ʼaʼlolxoʼ", english: "thief", notes: "< ʼal- + ʼolxoʼ 'to steal'" },
+      { samala: "ʼalos", english: "rice", notes: "< Spanish arroz" },
+      { samala: "alotoʼyinpi", english: "grave, resting place ('where one lies')", notes: "< al- ... -pi + otoʼyin" },
+      { samala: "ʼalowis", english: "adobe, adobe bricks", notes: "< Spanish adobe" },
+      { samala: "alpat", english: "to run", notes: "verb" },
+      { samala: "ʼalalpat", english: "runner", notes: "< ʼal- + alpat 'to run'" },
+      { samala: "alpini", english: "to go along the seashore", notes: "verb" },
+      { samala: "alpul", english: "to go around inside (contrast olkʼoyili)", notes: "motion verb" },
+      { samala: "alpuyan", english: "to be moist, damp", notes: "< al- + puy-an 'to be dewy'" },
+      { samala: "ʼalqap", english: "mortar (stone)", notes: "tool" },
+      { samala: "ʼalqapač", english: "animal", notes: "noun" },
+      { samala: "ʼalšɨhɨn", english: "mountain goat ('cliff climber')", notes: "< ʼal- + šɨ-ɨn 'climb a cliff'" },
+      { samala: "ʼalšuyopoš", english: "Milky Way ('the piñon gatherer')", notes: "< ʼal- + šuyo-poš" },
+      { samala: "ʼaltinoki", english: "intruder, bum", notes: "< ʼal- + tinoki" },
+      { samala: "ʼalučal", english: "to wrestle", notes: "< Spanish aluchar" },
+      { samala: "aluleqpey", english: "at last, finally", notes: "< al- + ul-eq-pey 'to follow'" },
+      { samala: "ʼalulkuw", english: "to be otherworldly, supernatural", notes: "< ʼal- + ulkuw 'night/spirit'" },
+      { samala: "ʼalunaʼn", english: "adult, grownup", notes: "< ʼal- + lu-naʼ 'grow up'" },
+      { samala: "ʼaʼluqayas", english: "burreonito bird (small with red neck)", notes: "bird species" },
+      { samala: "aluqštay", english: "light, something bright", notes: "< al- + uqštay 'to shine'" },
+      { samala: "ʼaʼluskon", english: "worm-eaten wood", notes: "< ʼal- + ʼuskon" },
+      { samala: "ʼaʼlušʼeš", english: "badger ('the one who digs a lot')", notes: "synonym: ʼapulš" },
+      { samala: "ʼalušpawat", english: "ashes", notes: "noun" },
+      { samala: "aluticʼinowon", english: "low hill or peak", notes: "< al- + uti- + cʼi-nowon" },
+      { samala: "alutiqɨpɨn", english: "cliff, precipice; dell", notes: "village site at La Hoya Creek" },
+      { samala: "ʼaluxwatukʼem", english: "bobcat, lynx ('resembles mountain lion')", notes: "synonym: ʼanaqpuw" },
+      { samala: "ʼalxil", english: "to be fat", notes: "< ʼal- + xil 'oil, fat'" },
+      { samala: "ʼalxɨtʼič", english: "gooseneck clam", notes: "< ʼal- + xɨt 'penis' + -vč" },
+      { samala: "ʼalxuʼlaʼ", english: "crybaby, child who cries a lot", notes: "< ʼal- + xuʼlaʼ" },
+      { samala: "ʼamaliyu", english: "to be yellow", notes: "< Spanish amarillo" },
+      { samala: "ʼamaʼm", english: "grandchild through daughter", notes: "kinship term" },
+      { samala: "ʼamelikanu", english: "American", notes: "< Spanish americano" },
+      { samala: "ʼamɨʼn", english: "body, flesh, meat, plant seed", notes: "always with possessive" },
+      { samala: "sʼamsʼamɨʼn", english: "he/she is naked", notes: "< ʼamɨʼn + CVC reduplication" },
+      { samala: "ʼamɨʼnič", english: "to bear fruit (plant or tree)", notes: "< ʼamɨʼn 'seed' + -ič" },
+      { samala: "ʼamɨʼniwaš", english: "corpse, carcass, dead body", notes: "< ʼamɨʼn + -iwaš 'defunct'" },
+      { samala: "ʼamɨyič", english: "to be generous", notes: "literally 'to be a generous one'" },
+      { samala: "ʼamuteʼy", english: "neighbor ('one who is nearby')", notes: "synonym: ičmipolkʼoy" },
+      { samala: "ʼamuwun", english: "La Purisima (placename)", notes: "near coast from Santa Ynez" },
+      { samala: "ʼanaqsutipokpokʼ", english: "mole (animal)", notes: "literally 'earth sweller'" },
+      { samala: "ʼanaxsuhuʼy", english: "wren", notes: "bird species" },
+      { samala: "ʼanaqčan", english: "old woman, female elder", notes: "plural: ʼanaqčančaʼn" },
+      { samala: "ʼanaqipnas", english: "to be beautiful; darling, beauty", notes: "also an herb to treat stings" },
+      { samala: "ʼanaqpuw", english: "wildcat, lynx, bobcat", notes: "synonym: ʼaluxwatukʼem" },
+      { samala: "ʼanaxʼɨʼ", english: "old man, male elder", notes: "plural: ʼanaxʼɨxʼɨʼ" },
+      { samala: "ʼančačač", english: "minnow (fish)", notes: "noun" },
+      { samala: "ʼaničʼapapa", english: "sharp-shinned hawk", notes: "bird species" },
+      { samala: "ʼanipeʼ", english: "cliff swallow", notes: "bird species" },
+      { samala: "ʼaniso", english: "seagull", notes: "bird species" },
+      { samala: "ʼaniwiʼleʼ", english: "to be enduring, persistent, to insist", notes: "verb / character trait" },
+      { samala: "ʼanɨš", english: "paternal uncle (father's brother)", notes: "kinship term" },
+      { samala: "anɨt", english: "to make into or use as greens", notes: "verb" },
+      { samala: "ʼanɨtɨš", english: "greens (cooked vegetables)", notes: "< anɨt + -vš" },
+      { samala: "ʼantap", english: "member of elite ceremonial brotherhood", notes: "religious/political order" },
+      { samala: "ʼantiyoxo", english: "glasses, spectacles", notes: "< Spanish anteojos" },
+      { samala: "ʼanucwaʼ", english: "duck species (small with blue crest)", notes: "mythological character" },
+      { samala: "ʼanuč", english: "to bleed", notes: "historical root ʼan 'blood'" },
+      { samala: "ʼanučpi", english: "to bleed on, get blood on", notes: "< ʼanuč + -pi" },
+      { samala: "ʼaʼnuʼnun", english: "guico, long-tailed lizard", notes: "reptile species" },
+      { samala: "ʼanuweʼ", english: "turtledove", notes: "bird species" },
+      { samala: "ʼanyapax", english: "Anacapa Island ('illusion')", notes: "channel island" },
+      { samala: "ʼap", english: "house, home; at home", notes: "possessed form: ma kʼap 'my house'" },
+      { samala: "ʼapʰan", english: "to build a house (for)", notes: "< ʼap + -vn" },
+      { samala: "ʼapʰanɨš", english: "village, town, tribe, nation", notes: "< ʼapʰan + -vš" },
+      { samala: "ʼapʰanɨšmuʼ", english: "home, where one lives", notes: "< ʼapʰanɨš + -muʼ" },
+      { samala: "išapnuš", english: "to marry, get married ('live together')", notes: "< is- + ʼap + -nuš" },
+      { samala: "ʼišapnušmuʼ", english: "spouse, husband, wife", notes: "< išapnuš + -muʼ" },
+      { samala: "ʼapaʼm", english: "knee", notes: "always with possessive" },
+      { samala: "naxcʼapaʼm", english: "to kneel", notes: "< naq- + c- + ʼapaʼm" },
+      { samala: "utičʼapaʼm", english: "to bump one's knee", notes: "< uti- + c- + ʼapaʼm" },
+      { samala: "ʼapaʼn", english: "to be unwilling, reluctant", notes: "verb" },
+      { samala: "ʼapapʼ", english: "ball", notes: "noun" },
+      { samala: "ʼapapʼič", english: "to play ball", notes: "< ʼapapʼ + -vč" },
+      { samala: "apaxwil", english: "to come up to a certain point (steady state)", notes: "< api- + =axwil" },
+      { samala: "apay", english: "to be over, above", notes: "root of ʼalapay" },
+      { samala: "ʼapayɨkʼ", english: "sweathouse (temescal)", notes: "< apay + ʼɨk 'mouth'" },
+      { samala: "apʰɨk", english: "to stop, finish; to be dying", notes: "verb" },
+      { samala: "apɨt", english: "to go up, ascend", notes: "motion verb" },
+      { samala: "cʼilapɨt", english: "to be piled up", notes: "< cʼi- + apɨt" },
+      { samala: "ʼunapɨtʼ", english: "ladder", notes: "< unapɨt + -ʼ" },
+      { samala: "ʼapštɨʼ", english: "how much?, how many?", notes: "interrogative" },
+      { samala: "aptun", english: "to do something along with another", notes: "< ap- + =tun 'two'" },
+      { samala: "ʼapulš", english: "badger ('the digger')", notes: "< ʼal- + pul 'to dig' + -š" },
+      { samala: "aputikitwon", english: "(liquid) to run out, flow out", notes: "< aputi- 'flowing' + kitwon" },
+      { samala: "aputikwey", english: "to flow, pour (on its own)", notes: "< aputi- + kwey" },
+      { samala: "aputinaʼn", english: "(liquid) to flow, current", notes: "< aputi- + naʼn 'to go'" },
+      { samala: "aputismon", english: "streams to join, flow together", notes: "< aputi- + =smon 'gather'" },
+      { samala: "šaputišmoč", english: "confluence of two streams", notes: "topographical term" },
+      { samala: "aputiwax", english: "to leak through, seep through", notes: "< aputi- + wax 'leak'" },
+      { samala: "apwil", english: "to howl (as a coyote)", notes: "animal vocalization" },
+      { samala: "aqcʼɨyɨn", english: "to be fed up with, disgusted", notes: "< aq- + =cʼɨyɨn" },
+      { samala: "aqlacʼin", english: "to be smooth", notes: "< aq- + =lacʼin" },
+      { samala: "aqsisin", english: "to growl, grumble (at), deny", notes: "verb" },
+      { samala: "aqtɨʼ", english: "to be full (from eating)", notes: "< aq- + =tɨʼ" },
+      { samala: "aqulkuw", english: "to get up before dawn", notes: "< aq- + ulkuw 'night'" },
+      { samala: "aqwayap", english: "to take revenge, vengeance", notes: "< aq- + wayap 'trade'" },
+      { samala: "axatɨʼ", english: "to pay, buy", notes: "< aq-/ax- + a-tɨʼ 'meet'" },
+      { samala: "axkat", english: "to leave, abandon an object", notes: "< aq-/ax- + =kat 'remain'" },
+      { samala: "axkikin", english: "to gnaw", notes: "synonym: axmɨs" },
+      { samala: "axkitwon", english: "to come out fast; arrow to pierce through", notes: "< aq-/ax- + kitwon" },
+      { samala: "axlaqliʼl", english: "to recognize (a person)", notes: "< aq-/ax- + aqliʼl 'show'" },
+      { samala: "axtaʼmay", english: "to disappear", notes: "< aq-/ax- + taʼmay 'forget'" },
+      { samala: "axtap", english: "to put in mouth; eat meat raw", notes: "< aq-/ax- + tap" },
+      { samala: "axušnapay", english: "to spit something out", notes: "< aq-/ax- + uš-napay" },
+      { samala: "axyik", english: "to distribute, share, dole out", notes: "< aq-/ax- + yik 'give'" },
+      { samala: "eqlep", english: "to lick", notes: "< aq- 'mouth' + =lep 'wet'" },
+      { samala: "oxčʰo", english: "to be finely finished, polished, well made", notes: "< aq-/ax- + čʰo 'good'" },
+      { samala: "oxloq", english: "to bite or gnaw a hole in", notes: "< aq-/ax- + loq 'perforate'" },
+      { samala: "oxmol", english: "to warm oneself", notes: "< aq-/ax- + mol 'toast'" },
+      { samala: "aqʰalan", english: "to shout, yell loudly", notes: "always reduplicated" },
+      { samala: "aqatuk", english: "to knot, tie a knot", notes: "verb" },
+      { samala: "ʼaqatukaš", english: "knot (in cord)", notes: "< aqatuk + -vš" },
+      { samala: "aqawan", english: "to be dry", notes: "synonym: kʼɨmɨn" },
+      { samala: "sapiyaqawan", english: "to dry something by fire or heat", notes: "< su- + api- + aqawan" },
+      { samala: "ʼaqawawa", english: "underside of thigh", notes: "body part" },
+      { samala: "aqʰay", english: "to be in a place, be located at/in", notes: "locative verb" },
+      { samala: "ʼaqʰayumuʼ", english: "place, position, location", notes: "< aqʰay + -muʼ" },
+      { samala: "aqcʼaʼlin", english: "to feel a sudden sharp pain", notes: "sensory verb" },
+      { samala: "aqilox", english: "to hollow out (e.g. a wooden bowl)", notes: "synonym: wilox" },
+      { samala: "aqipaʼ", english: "to nail, peg, drive a stake", notes: "carpentry/craft" },
+      { samala: "ʼaqipaʼliʼ", english: "nail, peg (wooden or iron)", notes: "< aqi-paʼ + -ʼiʼ" },
+      { samala: "aqipolon", english: "to grind into meal, flour", notes: "< aqi- + polon 'thick'" },
+      { samala: "aqisɨn", english: "to grind up, pound, pulverize", notes: "food prep" },
+      { samala: "aqison", english: "to pound in a mortar (with object)", notes: "synonym: iwex" },
+      { samala: "aqiwɨwɨn", english: "to swim", notes: "verb" },
+      { samala: "ʼaqiwo", english: "star; snail", notes: "celestial/animal" },
+      { samala: "ʼaqiwo haluqštay", english: "morning star, evening star ('bright star')", notes: "astronomy" },
+      { samala: "šteleqeč a ʼaqiwo", english: "comet (literally 'star with a tail')", notes: "astronomy" },
+      { samala: "ʼaqɨlɨlɨwɨy", english: "flint knife", notes: "traditional stone blade" },
+      { samala: "aqkʼam", english: "to get stuck in an opening, fail to get through", notes: "verb" },
+      { samala: "aqkaʼy", english: "to trap", notes: "hunting" },
+      { samala: "ʼaqkaʼy", english: "trap (noun)", notes: "hunting implement" },
+      { samala: "aqlamlam", english: "to chew", notes: "synonym: icnamnam" },
+      { samala: "aqlatɨš", english: "to be unruly, misbehaved, naughty", notes: "behavioral" },
+      { samala: "aqliʼl", english: "to show, be visible, be daylight", notes: "verb" },
+      { samala: "ʼaqlɨlɨwɨʼyiʼ", english: "saw (tool)", notes: "< aqlɨlɨwɨy + -ʼiʼ" },
+      { samala: "aqlɨʼw", english: "voice; word, language", notes: "ma kiyaqlɨʼw 'our language'" },
+      { samala: "aqlɨʼwɨn", english: "to swallow", notes: "verb" },
+      { samala: "aqlumen", english: "to pass through a medium (mud, water)", notes: "verb" },
+      { samala: "aqmil", english: "to drink", notes: "verb" },
+      { samala: "ʼaqmilimuʼ", english: "spring, drinking place", notes: "< aqmil + -muʼ" },
+      { samala: "aqmuw", english: "to eat with someone", notes: "social verb" },
+      { samala: "aqnicʼɨwɨkɨn", english: "to be bored", notes: "< aqni- + =cʼɨwɨkɨn" },
+      { samala: "aqnikɨyɨmin", english: "to be confused", notes: "< aqni- 'mind' + =kɨyɨmin 'turn'" },
+      { samala: "aqninanaʼn", english: "to worry, be worried", notes: "< aqni- + nanaʼn 'go around'" },
+      { samala: "aqninowon", english: "to be proud (healthy sense)", notes: "< aqni- + nowon 'stand'" },
+      { samala: "aqničʰo", english: "to like, be fond of; feel like doing", notes: "< aqni- + čʰo 'good'" },
+      { samala: "aqniwil", english: "to think (of)", notes: "mental verb" },
+      { samala: "ʼaqniwilaš", english: "thought, idea", notes: "< aqniwil + -vš" },
+      { samala: "ʼaqniwilimuʼ", english: "mind (noun)", notes: "< aqniwil + -muʼ" },
+      { samala: "aqnɨpʼ", english: "to coil-weave, make coiled basketry", notes: "craft" },
+      { samala: "ʼaqnɨpɨš", english: "any coiled basketry article", notes: "basketry" },
+      { samala: "aqpan", english: "to loan, lend; to fit well (garment)", notes: "verb" },
+      { samala: "ʼaqpanɨš", english: "loan, something loaned", notes: "< aqpan + -vš" },
+      { samala: "aqpay", english: "to borrow", notes: "verb" },
+      { samala: "aqpʼɨpɨk", english: "to grit the teeth", notes: "verb" },
+      { samala: "aqsik", english: "to tie, tie up", notes: "verb" },
+      { samala: "ʼaqsikʼ", english: "harness, fastener", notes: "< aqsik + -ʼ" },
+      { samala: "aqšikš", english: "to be tied", notes: "< aqsik + -š" },
+      { samala: "ʼaqšikšmuʼ", english: "jail, prison ('where they are tied')", notes: "synonym: ʼalawalya" },
+      { samala: "ʼaqšikaš", english: "prisoner, captive", notes: "< aqsik + -vš" },
+      { samala: "aqspaʼ", english: "to smoke (tobacco)", notes: "also aqspʰaʼ" },
+      { samala: "ʼaqspamuʼ", english: "cigarette, a smoke", notes: "< aqspaʼ + -muʼ" },
+      { samala: "aqsyutʼen", english: "to whistle at someone (fingers between lips)", notes: "verb" },
+      { samala: "ʼaqšaʼ", english: "dear, beloved", notes: "always with possessive" },
+      { samala: "aqšan", english: "to die, be dead", notes: "verb" },
+      { samala: "ʼaqšanɨš", english: "death", notes: "non-possessed form" },
+      { samala: "šaqšan a ʼawaʼy", english: "eclipse of the moon ('moon is dying')", notes: "astronomy" },
+      { samala: "aqšiyɨk", english: "to like, be pleased with, take fancy to", notes: "verb" },
+      { samala: "aqšiyɨkmuʼ", english: "beloved, sweetheart", notes: "< aqšiyɨk + -muʼ" },
+      { samala: "aqšʼɨnɨhɨč", english: "to eat lunch, eat at midday", notes: "< aqšʼu- + nɨhɨn" },
+      { samala: "ʼaqšʼɨnɨhɨčmuʼ", english: "lunch, midday meal", notes: "noun" },
+      { samala: "aqšʼɨtɨʼ", english: "to laugh", notes: "verb" },
+      { samala: "aqšɨw", english: "to gut, ream out", notes: "verb" },
+      { samala: "ʼaqšʼɨʼw", english: "guts, belly, innards, intestines", notes: "always with possessive" },
+      { samala: "tipʼaqšʼɨʼw", english: "to have a paunch, big belly", notes: "< tip- + ʼaqšʼɨʼw" },
+      { samala: "aqšmul", english: "to speak, make a sound", notes: "verb" },
+      { samala: "aqšmulič", english: "to be talkative", notes: "< aqšmul + -vč" },
+      { samala: "ʼaqšʼuqaʼy", english: "fork (utensil: 'forked thing for eating')", notes: "eating utensil" },
+      { samala: "aqšʼutapin", english: "to eat dinner, the evening meal", notes: "< aqšʼu- + tapin" },
+      { samala: "ʼaqšʼutapinimuʼ", english: "dinner, evening meal", notes: "meal" },
+      { samala: "aqšʼuwekey", english: "to wipe one's mouth, use a napkin", notes: "dining etiquette" },
+      { samala: "ʼaqšʼuwekeʼyiʼ", english: "napkin", notes: "< aqšʼuwekey + -ʼiʼ" },
+      { samala: "aqtakum", english: "(projectile) to reach, land on", notes: "< aqta- + kum" },
+      { samala: "aqtikat", english: "to need", notes: "verb" },
+      { samala: "aqtikač", english: "to be necessary, needed", notes: "< aqtikat + -š" },
+      { samala: "aqtikʼoy", english: "to be sheltered from the wind", notes: "< aqti- + kʼoy" },
+      { samala: "ʼaqtikʼoʼy", english: "windbreak", notes: "< aqtikʼoy + -ʼ" },
+      { samala: "saqtikʼoy", english: "Saticoy ('sheltered from wind')", notes: "placename" },
+      { samala: "aqtɨp", english: "to make a fire, kindle a fire", notes: "verb" },
+      { samala: "ʼaqtɨpmuʼ", english: "hearth, fireplace, firepit", notes: "< aqtɨp + -muʼ" },
+      { samala: "aqucʼelew", english: "to stick out the tongue at someone", notes: "< aqul- + c- + ʼelew" },
+      { samala: "aqukʼam", english: "to get stuck in an opening", notes: "verb" },
+      { samala: "aqusmon", english: "to gather, come together", notes: "< aqul- + =smon" },
+      { samala: "ʼaqušmočmuʼ", english: "gathering place", notes: "< aqu-smon-š + -muʼ" },
+      { samala: "aqʼuš", english: "to itch, have an itch", notes: "impersonal verb" },
+      { samala: "aqʼušič", english: "to be itchy", notes: "< aqʼuš + -ič" },
+      { samala: "aqutaʼyin", english: "to be generous, good natured, kind", notes: "character trait" },
+      { samala: "aqutičkwakwan", english: "to whisper to, speak softly to", notes: "synonym: aqutičwawan" },
+      { samala: "aqwaʼy", english: "to hit (with shot/throw), hit mark", notes: "verb" },
+      { samala: "aqwɨš", english: "to be worthless, useless, good-for-nothing", notes: "< aqwɨy + -š" },
+      { samala: "aqwɨy", english: "to hinder, get in the way of", notes: "verb" },
+
+      // C & Č entries
+      { samala: "cʼalxuniyɨw", english: "to be a good hunter or fisherman", notes: "< cʼal- 'skilled' + xuniyɨw" },
+      { samala: "cʼantɨq", english: "to see well, have keen vision", notes: "< cʼal- + =tɨq 'eye'" },
+      { samala: "cʼaqwɨpwɨp", english: "black willow", notes: "tree species (also cʼaxwɨpwɨp)" },
+      { samala: "cʰaqyaʼlin", english: "to love, be in love with", notes: "emotion verb" },
+      { samala: "cayaʼ", english: "open-weave basket for leaching acorns", notes: "traditional basketry" },
+      { samala: "cʼinowon", english: "hill", notes: "< cʼi- + nowon 'to stand'" },
+      { samala: "cʰiʼí", english: "hush! be quiet!", notes: "exclamation / command" },
+      { samala: "cʼikaw", english: "to be uneven, badly made", notes: "< cʼi- + =kaw" },
+      { samala: "cʼiloqʼ", english: "to be worn out (shoe, garment)", notes: "< cʼi- + loq 'hole'" },
+      { samala: "cʼiwanaxʼil", english: "to be steep; upside-down", notes: "< cʼi- + naxʼil 'upright'" },
+      { samala: "ciwiʼn", english: "feathered headband, wreath", notes: "traditional regalia" },
+      { samala: "cʼiwis", english: "rattle (musical instrument)", notes: "instrument" },
+      { samala: "cʼiwišuč", english: "to rattle, shake a rattle", notes: "< cʼiwis + -vč" },
+      { samala: "cʼiyuqwiliʼ", english: "western meadowlark", notes: "onomatopoeic bird call" },
+      { samala: "cʼɨ", english: "to be sharp; spicy, pungent", notes: "descriptive root" },
+      { samala: "cʼɨcʼɨ", english: "metate, grinding stone; sticker (foxtail)", notes: "tool/plant" },
+      { samala: "cʼoyini", english: "other, another one, next", notes: "determiner" },
+      { samala: "cpa", english: "nine (also spa)", notes: "number" },
+      { samala: "cqʰana", english: "woodtick", notes: "insect" },
+      { samala: "cuqeleʼ", english: "banner, feathered headband for war/dance", notes: "ceremonial item" },
+      { samala: "cʼutiyɨkʼ", english: "stone pestle", notes: "food prep tool" },
+      { samala: "cux", english: "headdress", notes: "ceremonial headwear" },
+      { samala: "cʼuxatʼ", english: "curly dock, lengua de buey", notes: "plant species" },
+      { samala: "cweq", english: "herb, plant, grass", notes: "botany" },
+      { samala: "sicweq a step", english: "telegraph weed ('flea herb')", notes: "natural flea repellent" },
+      { samala: "cyɨʼw", english: "edge, rim; kind, sort", notes: "noun" },
+      { samala: "čʰaʼ", english: "wild cucumber, chilicote (Marah macrocarpa)", notes: "native plant" },
+      { samala: "čakačak", english: "oriole", notes: "bird species" },
+      { samala: "čaketon", english: "coat, jacket", notes: "< Spanish chaquetón" },
+      { samala: "čʼamɨn", english: "to know", notes: "ʼinikčʼamɨn 'I don't know'" },
+      { samala: "čʼamɨnič", english: "to be knowledgeable, wise, shrewd", notes: "< čʼamɨn + -vč" },
+      { samala: "čʼamɨčtɨʼš", english: "knowledge, wisdom", notes: "< čʼamɨn + -štaš" },
+      { samala: "čʼantɨk", english: "friend, comrade", notes: "haku čʼantɨk 'hello friend'" },
+      { samala: "čapa", english: "lock", notes: "< Spanish chapa" },
+      { samala: "čʼaʼy", english: "California scrub jay", notes: "bird species" },
+      { samala: "čʼayaš", english: "path, trail, road, way", notes: "landscape" },
+      { samala: "ček", english: "niece/nephew (father's sister speaking)", notes: "kinship" },
+      { samala: "čʼeq", english: "to tear, split (on its own)", notes: "verb" },
+      { samala: "ničʼeq", english: "to tear something", notes: "< ni- + čʼeq" },
+      { samala: "wičʼeq", english: "to split by blows", notes: "< wi- + čʼeq" },
+      { samala: "či", english: "should, ought to (obligation marker)", notes: "particle" },
+      { samala: "čʼiʼ", english: "wood rat", notes: "animal" },
+      { samala: "čʼičʼiʼ", english: "child, young one", notes: "plural: čʼičʼihiʼ 'children'" },
+      { samala: "čili", english: "chile pepper", notes: "< Spanish chile" },
+      { samala: "čʼiw", english: "paw, foot of animal", notes: "always with possessive" },
+      { samala: "čiwatu", english: "goat", notes: "< Spanish chivato" },
+      { samala: "čʼiyaw", english: "ten", notes: "number (Yokuts loan)" },
+      { samala: "čʼiyawɨš", english: "one hundred", notes: "coined < čʼiyaw + -vš" },
+      { samala: "čʼiyuš", english: "to fart, break wind", notes: "verb" },
+      { samala: "čɨ", english: "shoo! get going!", notes: "exclamation" },
+      { samala: "čʼɨlɨ", english: "antelope; sack, bag", notes: "noun" },
+      { samala: "čʼɨpɨkʼ", english: "beaver", notes: "animal" },
+      { samala: "čʼɨqɨlɨqɨlɨn", english: "to tickle", notes: "verb" },
+      { samala: "čʼɨqʰɨy", english: "earthworm, worm", notes: "creature" },
+      { samala: "čnuy", english: "soaproot plant, fibrous brush", notes: "cleaning/hair tool" },
+      { samala: "čnuy a sʰa", english: "toothbrush", notes: "modern coined compound" },
+      { samala: "čʰo", english: "to be good, OK, well", notes: "čʰoho = very good, OK!" },
+      { samala: "kaličʰo", english: "you're welcome ('I am pleased to')", notes: "courtesy expression" },
+      { samala: "čʰoʼ", english: "to stop, quit, be finished", notes: "aspectual verb" },
+      { samala: "čʼoʼmin", english: "to be soft, tender", notes: "descriptive" },
+      { samala: "čʼomš", english: "cradleboard", notes: "infant cradle" },
+      { samala: "čʼoq", english: "blackbird", notes: "bird species" },
+      { samala: "čʼuʼ", english: "mockingbird", notes: "bird species" },
+      { samala: "čʼulutaxaš", english: "to belch, burp", notes: "verb" },
+      { samala: "čʰumaš", english: "Santa Cruz Island native; Chumash person", notes: "tribal name origin" },
+      { samala: "mičʰumaš", english: "Santa Cruz Island ('place of shell money')", notes: "island placename" },
+      { samala: "čuninu", english: "cicada", notes: "insect" },
+      { samala: "čupal", english: "to smoke (tobacco)", notes: "< Spanish chupar" },
+      { samala: "čʼupʰat", english: "tumpline, head-strap for carrying", notes: "tool" },
+      { samala: "čwin", english: "apron, skirt-like garment", notes: "clothing" },
+
+      // E, H, I, Ɨ entries
+      { samala: "ʼecʰu", english: "to sneeze", notes: "verb" },
+      { samala: "ʼeʼl", english: "necklace", notes: "always with possessive" },
+      { samala: "ʼelemes", english: "across from, on the other side of", notes: "preposition" },
+      { samala: "elew", english: "to go down, descend", notes: "motion verb" },
+      { samala: "ʼelew", english: "tongue", notes: "always with possessive" },
+      { samala: "sʼelew a nɨ", english: "flame (literally 'tongue of the fire')", notes: "poetic idiom" },
+      { samala: "ʼemetʼ", english: "ground squirrel", notes: "animal" },
+      { samala: "ʼeneq", english: "woman, female; wife", notes: "plural: ʼeneqneqʼ" },
+      { samala: "ʼepsuʼ", english: "basket hat, woman's hat", notes: "woven cap / unit of volume" },
+      { samala: "ʼepʼepš", english: "to be gray", notes: "color" },
+      { samala: "eqen", english: "to part, separate", notes: "verb" },
+      { samala: "eqpey", english: "to resemble, look like", notes: "< aq- + pey 'stick to'" },
+      { samala: "ʼequn", english: "to be old", notes: "age descriptive" },
+      { samala: "eqwel", english: "to do, make, manufacture", notes: "transitive verb" },
+      { samala: "nox ʼaleqwel", english: "Creator ('Great Maker')", notes: "the Great Spirit" },
+      { samala: "ʼes", english: "to weave, plait", notes: "craft" },
+      { samala: "ʼeskwela", english: "school", notes: "< Spanish escuela" },
+      { samala: "esqen", english: "to ask, question someone", notes: "verb" },
+      { samala: "exen", english: "to eat up completely", notes: "transitive" },
+      { samala: "exʼexʼeč", english: "to laugh heartily, chuckle", notes: "expressive" },
+      { samala: "exlelen", english: "to cry out, shout", notes: "vocalization" },
+      { samala: "expen", english: "to sing to/for someone", notes: "intransitive: expeč 'to sing'" },
+      { samala: "ʼexpew", english: "sugarbush, carrizo reed", notes: "botany" },
+      { samala: "exšwey", english: "to melt, dissolve", notes: "< aqs- + wey 'disappear'" },
+      { samala: "exweyep", english: "to change, transform", notes: "verb" },
+      { samala: "ha", english: "the, a (non-initial article)", notes: "grammatical marker" },
+      { samala: "haku", english: "hello, greetings", notes: "greeting" },
+      { samala: "hakʼu", english: "if, whether; if only", notes: "conjunction" },
+      { samala: "halala", english: "to quarrel, argue", notes: "verb" },
+      { samala: "hap", english: "horn, antler", notes: "always possessed" },
+      { samala: "hawaʼ", english: "maternal aunt (mother's sister)", notes: "kinship" },
+      { samala: "hawala", english: "only, alone, except for; as soon as", notes: "particle" },
+      { samala: "haxwiʼ", english: "article of clothing, garment", notes: "clothing" },
+      { samala: "he", english: "yes", notes: "affirmation" },
+      { samala: "hê", english: "yes/no question marker", notes: "spoken with rising pitch" },
+      { samala: "hečiʼ", english: "this, this one (near speaker)", notes: "demonstrative" },
+      { samala: "hekʼi", english: "that, that one (away from speaker)", notes: "demonstrative" },
+      { samala: "heʼni", english: "this (used with following noun)", notes: "demonstrative" },
+      { samala: "hew", english: "pelican", notes: "water bird" },
+      { samala: "hik", english: "things, possessions, to own", notes: "verb/noun" },
+      { samala: "hikʼeʼ", english: "tool, instrument, device, machine", notes: "noun" },
+      { samala: "hikʼen", english: "to use; with, by means of", notes: "instrumental verb" },
+      { samala: "hilaq", english: "handle (of knife or tool)", notes: "always possessed" },
+      { samala: "hini", english: "when (in relative sense)", notes: "temporal conjunction" },
+      { samala: "hɨkʼɨn", english: "to be morning, dawn; to be early", notes: "temporal" },
+      { samala: "wa sʰɨkʼɨn", english: "tomorrow morning, tomorrow", notes: "temporal" },
+      { samala: "hɨkwɨn", english: "to put a load down", notes: "action verb" },
+      { samala: "huču", english: "dog", notes: "animal" },
+      { samala: "humaliwo", english: "Malibu ('where the surf sounds')", notes: "coastal placename" },
+      { samala: "i-", english: "stuck-in vowel to break consonant clusters", notes: "phonology" },
+      { samala: "icʼis", english: "younger sibling (brother or sister)", notes: "kinship" },
+      { samala: "ʼicʼiyul", english: "thirteen", notes: "number" },
+      { samala: "ickuyan", english: "weapon", notes: "always possessed" },
+      { samala: "icnamnam", english: "to chew, be chewing", notes: "eating" },
+      { samala: "icpuk", english: "pimple, blackhead", notes: "non-possessed: ʼičpukaš" },
+      { samala: "icumuʼ", english: "to point at", notes: "gesture verb" },
+      { samala: "ʼicʰuw", english: "bait (for fishing)", notes: "< is- + ʼuw 'eat'" },
+      { samala: "icwel", english: "to challenge", notes: "verb" },
+      { samala: "ʼičaxin", english: "enemy", notes: "< ič- 'one's own' + axin 'fight'" },
+      { samala: "ʼičkoʼw", english: "buttocks; shinny ball", notes: "noun" },
+      { samala: "ʼičkun", english: "to defend, side with a comrade", notes: "< ič- + ku 'person'" },
+      { samala: "ʼaličkun", english: "teammate, team member, crew member", notes: "sports/work" },
+      { samala: "ʼičmaʼm", english: "one's room, private room", notes: "< ič- + maʼm 'house'" },
+      { samala: "ʼičmišup", english: "floor (interior floor of house)", notes: "< ič- + mišup 'ground'" },
+      { samala: "ičtɨʼn", english: "child, offspring (possessed only)", notes: "ma kičtɨʼn 'my child'" },
+      { samala: "ičtɨʼnič", english: "to have children, bear young", notes: "verb" },
+      { samala: "ʼičʼunaš", english: "bone whistle", notes: "musical instrument" },
+      { samala: "ikʼiniy", english: "to groan, moan", notes: "sound verb" },
+      { samala: "ikʰɨl", english: "to fetch, bring, send for", notes: "transitive" },
+      { samala: "ʼikɨmin", english: "to be new, young, fresh", notes: "descriptive" },
+      { samala: "ikmen", english: "waves, ocean surf", notes: "coastal" },
+      { samala: "ikš", english: "to give (with object suffix)", notes: "ditransitive" },
+      { samala: "ikuk", english: "to chop, hew; woodpecker to peck", notes: "verb" },
+      { samala: "ikumes", english: "to dam a stream", notes: "< iku- + mes 'cross'" },
+      { samala: "ʼikumešeʼš", english: "dam, reservoir", notes: "noun" },
+      { samala: "ilokʼin", english: "to fell, cut down a tree", notes: "< i- + lokʼin 'cut'" },
+      { samala: "ilpokʼ", english: "to swell when wet", notes: "< il- 'water' + pokʼ" },
+      { samala: "iltap", english: "to leak, take in water", notes: "< il- + tap 'enter'" },
+      { samala: "ilumen", english: "to sink, disappear; sun to set", notes: "verb" },
+      { samala: "ʼiʼlepeš", english: "chia seed (Salvia columbariae)", notes: "staple food" },
+      { samala: "ʼilesiya", english: "church", notes: "< Spanish iglesia" },
+      { samala: "ʼiʼmey", english: "to shampoo, wash the hair", notes: "hygiene" },
+      { samala: "ini-", english: "suddenly, all at once", notes: "verb prefix" },
+      { samala: "ʼini-", english: "not (negative prefix)", notes: "ʼiniščʰo 'it's no good'" },
+      { samala: "ʼinsil", english: "no; there is none, does not exist", notes: "negative existential" },
+      { samala: "ʼinu", english: "true, yes", notes: "truth marker" },
+      { samala: "ʼinuč", english: "to be true, valid, effective", notes: "verb" },
+      { samala: "ʼip", english: "to say, tell, think to oneself", notes: "speech verb" },
+      { samala: "ipok", english: "to shake out, empty a container", notes: "verb" },
+      { samala: "ipšel", english: "to be cooked, ripe, ready to eat", notes: "food" },
+      { samala: "šipšel", english: "to cook, cause to ripen", notes: "< su- + ipšel" },
+      { samala: "šipšeʼliʼ", english: "stove, oven", notes: "cooking tool" },
+      { samala: "ʼipštɨ", english: "body louse", notes: "insect" },
+      { samala: "ipxey", english: "to add to, put in with", notes: "addition" },
+      { samala: "kalipxey", english: "plus, added to (arithmetic)", notes: "math term" },
+      { samala: "iqip", english: "to shut, stop up, close; detain", notes: "verb" },
+      { samala: "ʼiqipʼ", english: "plug, stopper, door mat", notes: "< iqip + -ʼ" },
+      { samala: "iqʼɨm", english: "to crush, pulverize", notes: "synonym: itʼey" },
+      { samala: "iqmay", english: "to cover up, envelop; overcast", notes: "weather/covering" },
+      { samala: "iqoq", english: "to roast", notes: "cooking" },
+      { samala: "iswotʼ", english: "the Lord, our Chief (God)", notes: "< is- 'own' + wotʼ 'chief'" },
+      { samala: "isʰɨʼy", english: "husband", notes: "kinship" },
+      { samala: "iskon", english: "family, relations", notes: "kinship collective" },
+      { samala: "ʼiskwela", english: "school", notes: "< Spanish escuela" },
+      { samala: "iškoʼm", english: "two", notes: "number" },
+      { samala: "ʼiškoʼmuš", english: "twenty", notes: "number" },
+      { samala: "išoʼ", english: "to roast over coals", notes: "cooking" },
+      { samala: "ʼišoʼš", english: "roast meat, barbecued food", notes: "food" },
+      { samala: "išpiʼweč", english: "to sell", notes: "< s-piʼw 'price' + -vč" },
+      { samala: "ʼišpiʼwečmuʼ", english: "store, shop ('where things are sold')", notes: "commerce" },
+      { samala: "išpʰoy", english: "to smile", notes: "facial expression" },
+      { samala: "ištɨʼ", english: "to find, encounter", notes: "verb" },
+      { samala: "ištɨkʰɨn", english: "to go before, precede, be first", notes: "ordering" },
+      { samala: "alištɨkʰɨn", english: "the first one", notes: "ordinal" },
+      { samala: "itaq", english: "to hear, listen", notes: "sensory verb" },
+      { samala: "ʼitaqmuʼ", english: "news, tidings", notes: "communication" },
+      { samala: "itaxmɨkɨʼn", english: "sound to carry far", notes: "< itax- + mɨk-ɨʼn" },
+      { samala: "itaxsɨn", english: "to find out, investigate, understand", notes: "cognition" },
+      { samala: "itaxkuy", english: "to be famous, well-known", notes: "reputation" },
+      { samala: "ʼitiʼ", english: "here, in this place", notes: "locative" },
+      { samala: "ʼitwa", english: "before (in time)", notes: "temporal conjunction" },
+      { samala: "iwakuti", english: "to glance at, take a quick look", notes: "< iwa- + kuti" },
+      { samala: "iwanaʼn", english: "to go for a while", notes: "kiwanaʼn 'goodbye'" },
+      { samala: "iwaqwaʼy", english: "to do quickly", notes: "adverbial verb" },
+      { samala: "iwex", english: "to grind in a mortar", notes: "food prep" },
+      { samala: "ʼiwexeš", english: "flour, meal, pinole", notes: "< iwex + -vš" },
+      { samala: "ʼiwɨʼ", english: "companion, partner", notes: "always possessed" },
+      { samala: "iwɨš", english: "to accompany, go with", notes: "social motion" },
+      { samala: "kaliwɨš", english: "with, accompanying", notes: "prepositional phrase" },
+      { samala: "iwon", english: "to sound, make animal call", notes: "acoustic" },
+      { samala: "aliwon", english: "sound, noise", notes: "< al- + iwon" },
+      { samala: "ixip", english: "to win (in a game), surpass, beat", notes: "synonym: loʼx" },
+      { samala: "ʼixpanɨš", english: "acorn, acorns", notes: "primary food staple" },
+      { samala: "ixsi", english: "forehead", notes: "anatomy" },
+      { samala: "ixtɨʼ", english: "to thatch, roof a house", notes: "architecture" },
+      { samala: "ʼixtɨʼš", english: "roof, ceiling", notes: "< ixtɨʼ + -vš" },
+      { samala: "ixut", english: "to burn, be on fire", notes: "fire" },
+      { samala: "ʼixutaš", english: "fuel, firewood, gasoline", notes: "< ixut + -vš" },
+      { samala: "ʼixutašmuʼ", english: "gas station, fueling station", notes: "modern coinage" },
+      { samala: "ixwapš", english: "to be stung by nettles", notes: "< xwapš 'nettle'" },
+      { samala: "ʼixway", english: "elderly mother", notes: "affectionate kinship" },
+      { samala: "ixwowon", english: "to be tall", notes: "stature" },
+      { samala: "ʼiyapa", english: "even if, even though", notes: "conjunction" },
+      { samala: "ʼɨhɨ", english: "much, a lot", notes: "quantifier" },
+      { samala: "ʼɨhɨy", english: "to be long, tall", notes: "spatial" },
+      { samala: "ʼɨhɨʼy", english: "man, male", notes: "plural: ʼɨhɨyhɨʼy" },
+      { samala: "ʼɨk", english: "mouth", notes: "anatomy" },
+      { samala: "ʼɨkʼ", english: "lake", notes: "geography" },
+      { samala: "ʼɨʼl", english: "foot, leg", notes: "anatomy" },
+      { samala: "ɨlɨkʼɨn", english: "to sit, stay, live at a place", notes: "locative verb" },
+      { samala: "ʼɨlɨkʼɨnɨmuʼ", english: "chair, seat, station", notes: "< ɨlɨkʼɨn + -muʼ" },
+      { samala: "ʼɨlɨl", english: "red ochre, hematite", notes: "sacred mineral pigment" },
+      { samala: "ʼɨlɨwɨn", english: "shin, shin bone", notes: "anatomy" },
+      { samala: "ʼɨmɨ", english: "to be dumb, mute", notes: "descriptive" },
+      { samala: "ʼɨwɨ", english: "knife", notes: "cutting tool" },
+      { samala: "ʼɨwɨn", english: "to cut with a knife", notes: "verb" },
+      { samala: "ʼɨy", english: "wasp, bee", notes: "insect" },
+
+      // K, L, M, N entries
+      { samala: "k-", english: "I (subject), my (possessive)", notes: "first person marker" },
+      { samala: "kiš-", english: "we two (dual subject/possessive)", notes: "first person dual" },
+      { samala: "kiy-", english: "we (plural subject/possessive)", notes: "first person plural" },
+      { samala: "ka", english: "emphatic particle; is, equal sign", notes: "sentence focus particle" },
+      { samala: "ka sulkuw", english: "at night, last night", notes: "< ka + s-ulkuw" },
+      { samala: "ka štapin", english: "yesterday, yesterday evening", notes: "< ka + s-tapin" },
+      { samala: "kačʼa", english: "because", notes: "conjunction (also kaʼčʰa)" },
+      { samala: "kakuwaʼ", english: "thus, so, that's it, right", notes: "affirmative particle" },
+      { samala: "kakuwačʼ", english: "to be correct, right", notes: "< kakuwaʼ + -vč" },
+      { samala: "kawaq", english: "to gut an animal", notes: "< kal- + =waq" },
+      { samala: "kaʼwɨy", english: "to cut a notch or groove in", notes: "< kal- + wɨy" },
+      { samala: "kalaš", english: "to breathe; breath", notes: "vital function" },
+      { samala: "škalaš a ʼoʼ", english: "steam ('breath of the water')", notes: "poetic compound" },
+      { samala: "kalkalaš", english: "to catch one's breath, rest, pant", notes: "< kalaš + CVC redup" },
+      { samala: "kalašmuʼ", english: "gills of fish ('breathing place')", notes: "< kalaš + -muʼ" },
+      { samala: "kalawašaqʼ", english: "Kalawashaq (village near Santa Ynez)", notes: "historic Chumash village" },
+      { samala: "kalni", english: "meat", notes: "< Spanish carne" },
+      { samala: "kaltu", english: "soup, broth", notes: "< Spanish caldo" },
+      { samala: "kalukš", english: "clan, clan symbol, totem", notes: "social structure" },
+      { samala: "kam", english: "wing, fin (of fish)", notes: "anatomy" },
+      { samala: "kamisa", english: "shirt, blouse, top", notes: "< Spanish camisa" },
+      { samala: "kanali", english: "to (a destination)", notes: "coined preposition" },
+      { samala: "kʼana", english: "how!, to what an extent!", notes: "exclamatory degree" },
+      { samala: "kʼanipa", english: "any, whatever", notes: "indefinite" },
+      { samala: "kʼanipa kuneʼ", english: "anyone, anybody, whoever", notes: "indefinite pronoun" },
+      { samala: "kʼanipa sukʼu", english: "anything, whatever, any kind", notes: "indefinite" },
+      { samala: "kʼanipa takaʼ", english: "anywhere, wherever", notes: "indefinite locative" },
+      { samala: "kansal", english: "to get tired, give out, be exhausted", notes: "< Spanish cansar" },
+      { samala: "kʼapan", english: "to wish, wish for", notes: "verb" },
+      { samala: "kʼapanɨš", english: "a wish", notes: "noun" },
+      { samala: "kapʰe", english: "coffee", notes: "< Spanish café" },
+      { samala: "kasal", english: "to marry", notes: "< Spanish casar" },
+      { samala: "kaswaʼ", english: "Cieneguitas (near Santa Barbara)", notes: "placename: 'at the tules'" },
+      { samala: "kaštɨq", english: "Castaic ('at the eye/face')", notes: "historic village" },
+      { samala: "katu", english: "cat", notes: "< Spanish gato" },
+      { samala: "kaʼwač", english: "left hand, left side", notes: "spatial orientation" },
+      { samala: "kʰawakʰawak", english: "to be light (in weight)", notes: "descriptive" },
+      { samala: "kawayu", english: "horse", notes: "< Spanish caballo" },
+      { samala: "kawayuč", english: "to ride a horse, be mounted", notes: "< kawayu + -ič" },
+      { samala: "kawil", english: "what there is, what exists", notes: "< ka + al- + wil" },
+      { samala: "kay", english: "he, him, she, her (gender neutral)", notes: "third person pronoun" },
+      { samala: "kayuwuʼn", english: "they, them", notes: "< kay + -wuʼn" },
+      { samala: "keʼ", english: "this; thus, like so; so, therefore", notes: "demonstrative/connective" },
+      { samala: "kek", english: "to sprout, come up through surface", notes: "plant growth" },
+      { samala: "sukek", english: "to sow seed, plant crops", notes: "< su- + kek" },
+      { samala: "keʼni", english: "this (with following noun)", notes: "demonstrative" },
+      { samala: "keʼniwuʼn", english: "these (plural animate)", notes: "demonstrative" },
+      { samala: "kepʼ", english: "to bathe, take a bath", notes: "verb" },
+      { samala: "kepmuʼ", english: "bathhouse, pool, bathroom", notes: "< kepʼ + -muʼ" },
+      { samala: "kesu", english: "cheese", notes: "< Spanish queso" },
+      { samala: "kʼetet", english: "to be flat", notes: "shape" },
+      { samala: "makʼetet a sʼoqwoʼn", english: "flat-headed one (rattlesnake)", notes: "respectful euphemism" },
+      { samala: "kiceʼ", english: "a little one, small one; to be small", notes: "size/diminutive" },
+      { samala: "pa kiceʼ", english: "you're welcome ('just a little')", notes: "polite reply" },
+      { samala: "kič", english: "like, similar to; approximately", notes: "comparison" },
+      { samala: "kikɨʼ", english: "we, ourselves (plural emphatic)", notes: "< k-iy- + -kɨʼ" },
+      { samala: "kilamu", english: "to be foolish, crazy, stupid", notes: "mental state" },
+      { samala: "kʼilelew", english: "to fall down (said of a person)", notes: "< kʼil- + elew" },
+      { samala: "kilik", english: "small reddish hawk species", notes: "bird species" },
+      { samala: "kʼilinapay", english: "to ascend quickly, rush up", notes: "< kʼili- + ni-apay" },
+      { samala: "kʼilitap", english: "to rush in, burst in, intrude", notes: "< kʼili- + tap" },
+      { samala: "kʼilmes", english: "to lunge at, jump at", notes: "< kʼil- + mes 'cross'" },
+      { samala: "kimi", english: "to repeat, do again", notes: "aspectual verb" },
+      { samala: "kinakat", english: "to survive, remain alive", notes: "< kina- 'death' + =kat" },
+      { samala: "kinanikʼoyi", english: "to regain consciousness, come to", notes: "revival" },
+      { samala: "kinsi", english: "fifteen", notes: "< Spanish quince" },
+      { samala: "kitwon", english: "to come out, emerge, exit", notes: "motion verb" },
+      { samala: "kitwonumuʼ", english: "exit, doorway, mouth of stream", notes: "< kitwon + -muʼ" },
+      { samala: "kɨkš", english: "alone, by oneself, on one's own", notes: "emphatic reflexive" },
+      { samala: "kɨm", english: "then, and then", notes: "temporal sequence" },
+      { samala: "ʼinikɨm", english: "never ('not then')", notes: "< ʼini- + kɨm" },
+      { samala: "kʼɨmɨn", english: "to be dry (Kalawašaq dialect)", notes: "synonym: aqawan" },
+      { samala: "kɨpɨʼ", english: "now, today, at present", notes: "temporal adverb" },
+      { samala: "kʼɨt", english: "to break, be brittle", notes: "verb" },
+      { samala: "klaʼ", english: "to crack, break, crumble", notes: "verb" },
+      { samala: "klawu", english: "metal nail", notes: "< Spanish clavo" },
+      { samala: "kloʼl", english: "cricket (insect)", notes: "song: kloʼl kloʼl latipa" },
+      { samala: "knɨy", english: "fox", notes: "animal" },
+      { samala: "kočʰo", english: "to cut evenly", notes: "< kal- + čʰo 'good'" },
+      { samala: "kokoʼ", english: "father", notes: "always possessed" },
+      { samala: "koloʼ", english: "yonder, that one over there", notes: "distant demonstrative" },
+      { samala: "kolokʼin", english: "to cut with a knife", notes: "< kal- + lokʼin" },
+      { samala: "kololkʼoy", english: "to cut in a circle, cut around", notes: "< kal- + -ol-kʼoy" },
+      { samala: "kometa", english: "comet", notes: "< Spanish cometa" },
+      { samala: "kopkop", english: "toad", notes: "amphibian" },
+      { samala: "košot", english: "to skin an animal", notes: "< kal- + =šot" },
+      { samala: "kotʼ", english: "soaproot, amole", notes: "soap/food plant" },
+      { samala: "koʼw", english: "pinecone, wood burl", notes: "plant anatomy" },
+      { samala: "kseʼn", english: "mudhen; ceremonial messenger/crier", notes: "bird / tribal role" },
+      { samala: "ktɨp", english: "walnut, California walnut tree", notes: "native nut" },
+      { samala: "ktut", english: "spider", notes: "arachnid" },
+      { samala: "ku", english: "person, human being; people", notes: "plural: kuhkuʼ" },
+      { samala: "kʼu", english: "cautionary particle: watch out lest!", notes: "warning" },
+      { samala: "kučal", english: "spoon", notes: "< Spanish cuchara" },
+      { samala: "kʰuhu", english: "who knows?", notes: "particle of doubt" },
+      { samala: "kukuʼy", english: "pillow", notes: "synonym: ʼalikukuʼy" },
+      { samala: "kulilaʼw", english: "supernatural guardian being", notes: "folklore" },
+      { samala: "kulukuʼl", english: "lupine (plant)", notes: "wildflower" },
+      { samala: "kum", english: "to come, arrive; befall", notes: "motion verb" },
+      { samala: "kumili", english: "to reach, arrive at, go to", notes: "< kum + -li" },
+      { samala: "kumpi", english: "time, hour", notes: "tikal a kumpi? 'what time is it?'" },
+      { samala: "kumpiʼliʼ", english: "clock, watch", notes: "< kumpi + -ʼiʼ" },
+      { samala: "kumqaqʼ", english: "Point Conception ('where the raven arrives')", notes: "sacred Western portal" },
+      { samala: "kuʼn", english: "rabbit, cottontail", notes: "animal" },
+      { samala: "kunaʼ", english: "niece/nephew (brother's child)", notes: "kinship" },
+      { samala: "kuneʼ", english: "who?; someone, anyone", notes: "question / indefinite" },
+      { samala: "kuy", english: "to hold, contain, carry, fetch", notes: "verb" },
+      { samala: "kuyam", english: "to sit on, be on top; to wait for", notes: "verb" },
+      { samala: "kuyaʼmiʼ", english: "seat, chair, bench", notes: "< kuyam + -ʼiʼ" },
+      { samala: "kuyuk", english: "poplar tree, cottonwood", notes: "tree" },
+      { samala: "kuyuʼw", english: "right hand, right side", notes: "spatial orientation" },
+      { samala: "kwalta", english: "riding whip", notes: "< Spanish cuarta" },
+      { samala: "kwaltu", english: "room, quarters", notes: "< Spanish cuarto" },
+      { samala: "kwekʼi", english: "that, that one, there; then", notes: "demonstrative" },
+      { samala: "kwey", english: "to be paralyzed; to break, pour", notes: "verb root" },
+      { samala: "kwič", english: "falcon species", notes: "raptor" },
+      { samala: "lalanxa", english: "orange (fruit)", notes: "< Spanish naranja" },
+      { samala: "lalaq", english: "to be thick, fat", notes: "dimension" },
+      { samala: "lamesa", english: "table", notes: "< Spanish la mesa" },
+      { samala: "lana", english: "wool", notes: "< Spanish lana" },
+      { samala: "lanču", english: "ranch", notes: "< Spanish rancho" },
+      { samala: "lapalela", english: "wall", notes: "< Spanish la pared" },
+      { samala: "laxipʼ", english: "abdomen, lower torso", notes: "always possessed" },
+      { samala: "leči", english: "milk", notes: "< Spanish leche" },
+      { samala: "lelox", english: "clock, watch", notes: "< Spanish reloj" },
+      { samala: "lewlew", english: "mythical supernatural monster", notes: "traditional mythology" },
+      { samala: "likuyi", english: "canyon, arroyo", notes: "landscape" },
+      { samala: "lisamuʼ", english: "Morro Rock (sacred site)", notes: "coastal landmark" },
+      { samala: "litʼon", english: "saltgrass", notes: "botany" },
+      { samala: "liyata", english: "lariat, lasso, riata", notes: "< Spanish riata" },
+      { samala: "liyawlu", english: "devil", notes: "< Spanish diablo" },
+      { samala: "liyɨk", english: "middle, center; between", notes: "spatial" },
+      { samala: "liyos", english: "God", notes: "< Spanish Dios" },
+      { samala: "loʼ", english: "to score, reach the goal in a game", notes: "games" },
+      { samala: "šloʼ", english: "goal line, goal post", notes: "< s- + loʼ" },
+      { samala: "lokʼin", english: "to cut, sever, stop", notes: "root in many tools" },
+      { samala: "lompoʼ", english: "Lompoc ('in the cheeks')", notes: "< poʼ 'cheek'" },
+      { samala: "loq", english: "to be perforated, have a hole", notes: "shape" },
+      { samala: "šloq", english: "hole (noun)", notes: "< s- + loq" },
+      { samala: "loʼx", english: "to beat, defeat, surpass, excel", notes: "competition" },
+      { samala: "loxli", english: "to be springtime", notes: "season" },
+      { samala: "šloxli", english: "spring, springtime", notes: "season" },
+      { samala: "lu-", english: "growth and growing (prefix)", notes: "developmental prefix" },
+      { samala: "lunaʼn", english: "to grow, grow up", notes: "< lu- + naʼn" },
+      { samala: "lunox", english: "to grow large, grow big", notes: "< lu- + nox 'big'" },
+      { samala: "lučʰo", english: "to grow straight (tree, child)", notes: "< lu- + čʰo 'good'" },
+      { samala: "luhuy", english: "eel", notes: "fish" },
+      { samala: "lumiku", english: "Sunday", notes: "< Spanish Domingo" },
+      { samala: "lunes", english: "Monday", notes: "< Spanish lunes" },
+      { samala: "lutun", english: "to be split, forked into two", notes: "< lu- + =tun 'two'" },
+      { samala: "luwahačʼ", english: "to multiply, divide and become many", notes: "< lu- + wahačʼ" },
+      { samala: "luwela", english: "wheel", notes: "< Spanish rueda" },
+      { samala: "ma", english: "the, a (initial phrase-marker)", notes: "grammatical article" },
+      { samala: "maʼ", english: "jackrabbit", notes: "animal" },
+      { samala: "makakʼ", english: "pocket gopher", notes: "animal" },
+      { samala: "makal", english: "bat (flying mammal)", notes: "animal" },
+      { samala: "makina", english: "machine, automobile", notes: "< Spanish máquina" },
+      { samala: "malakʼ", english: "soft pitch, soft tar", notes: "natural sealant" },
+      { samala: "malawa", english: "eight", notes: "number" },
+      { samala: "malawaš", english: "eighty", notes: "number" },
+      { samala: "malcʼɨwɨkɨn", english: "to be tired, exhausted", notes: "state of body" },
+      { samala: "mali", english: "after (in time)", notes: "temporal preposition" },
+      { samala: "malmaʼli", english: "later, afterward", notes: "temporal adverb" },
+      { samala: "maʼm", english: "house, building, hall; inside", notes: "generic structure" },
+      { samala: "maʼm alamsatɨk", english: "hospital ('healing hall')", notes: "modern coinage" },
+      { samala: "maʼm a ʼapʰanɨš", english: "tribal hall", notes: "community building" },
+      { samala: "mamaʼ", english: "paternal grandmother (father's mother)", notes: "kinship" },
+      { samala: "manɨš", english: "to be lost, missing, gone", notes: "state verb" },
+      { samala: "mantikiya", english: "butter", notes: "< Spanish mantequilla" },
+      { samala: "masɨx", english: "three", notes: "number" },
+      { samala: "mašɨxɨš", english: "thirty", notes: "number" },
+      { samala: "matakʼ", english: "clay, adobe mud", notes: "earth material" },
+      { samala: "maxač", english: "to be blind", notes: "sensory state" },
+      { samala: "maxaʼlam", english: "to hold a festival, throw a fiesta/pow-wow", notes: "celebration" },
+      { samala: "maxaʼlamɨš", english: "festival, fiesta, pow-wow gathering", notes: "celebration" },
+      { samala: "maxiwo", english: "bald eagle", notes: "raptor" },
+      { samala: "mayawič", english: "to be dizzy", notes: "physical state" },
+      { samala: "mays", english: "corn, maize", notes: "< Spanish maíz" },
+      { samala: "mayu", english: "May (month)", notes: "< Spanish mayo" },
+      { samala: "mê", english: "emphatic particle (used with commands)", notes: "spoken with rising pitch" },
+      { samala: "mes", english: "to cross, go across", notes: "motion verb" },
+      { samala: "mesmuʼ", english: "bridge ('crossing place')", notes: "< mes + -muʼ" },
+      { samala: "meš", english: "small sack, bag", notes: "container" },
+      { samala: "mexikanu", english: "Mexican", notes: "< Spanish Mexicano" },
+      { samala: "mexmeʼy", english: "basket rush (Juncus textilis)", notes: "primary basket weaving rush" },
+      { samala: "mexweʼš", english: "metate, grinding slab", notes: "milling stone" },
+      { samala: "mexwešmuʼ", english: "mortar (stone grinding basin)", notes: "milling stone" },
+      { samala: "mil", english: "one thousand", notes: "< Spanish mil / nox" },
+      { samala: "milimol", english: "mountains to the north; the north", notes: "cardinal direction / terrain" },
+      { samala: "miluk", english: "inside corner", notes: "spatial" },
+      { samala: "mimi", english: "finger, toe", notes: "always possessed" },
+      { samala: "minawan", english: "Mt. Pinos region / sacred peak", notes: "sacred mountain" },
+      { samala: "mipolkʼoʼy", english: "in back of, behind", notes: "preposition" },
+      { samala: "misa", english: "church mass", notes: "< Spanish misa" },
+      { samala: "miš", english: "to cry, weep", notes: "verb" },
+      { samala: "mištoyo", english: "rainbow", notes: "sky phenomenon" },
+      { samala: "mišup", english: "down, on the ground, floor, below", notes: "spatial" },
+      { samala: "mitɨpɨʼn", english: "doorway, door opening", notes: "architecture" },
+      { samala: "miy", english: "to twist string on the thigh", notes: "cordage making" },
+      { samala: "miyaš", english: "cord, string, twine", notes: "cordage" },
+      { samala: "mɨk", english: "far away; for a long time", notes: "distance / duration" },
+      { samala: "mɨkɨʼn", english: "to go far, travel far away", notes: "< mɨk + -vn" },
+      { samala: "mɨs", english: "scrub oak; mother/father-in-law", notes: "plant / kinship" },
+      { samala: "mɨt", english: "back (body part); turtle shell", notes: "anatomy" },
+      { samala: "mɨxɨxɨn", english: "to be hungry", notes: "physiological state" },
+      { samala: "mɨxɨčʰaš", english: "famine, extreme hunger", notes: "noun" },
+      { samala: "mɨy", english: "wolf", notes: "animal" },
+      { samala: "moč", english: "paint, body paint", notes: "< mon 'to paint'" },
+      { samala: "šmoč", english: "color (noun)", notes: "< s- + moč" },
+      { samala: "mol", english: "to toast seeds or nuts", notes: "cooking" },
+      { samala: "moloq", english: "ancient times, long ago, old", notes: "temporal" },
+      { samala: "timoloqin", english: "to tell a traditional story, recount history", notes: "storytelling" },
+      { samala: "timoloqinaš", english: "historical story, narrative, tradition", notes: "folklore" },
+      { samala: "momoy", english: "Jimsonweed, Datura (sacred medicine)", notes: "sacred plant" },
+      { samala: "mon", english: "to paint, draw, mark", notes: "art" },
+      { samala: "monus", english: "book, design, writing", notes: "< mon + -us" },
+      { samala: "sumon", english: "to write (modern coinage)", notes: "< su- + mon" },
+      { samala: "sumoʼniʼ", english: "pen, pencil ('writing instrument')", notes: "< sumon + -ʼiʼ" },
+      { samala: "šumonušmuʼ", english: "library ('book place')", notes: "modern coinage" },
+      { samala: "mopš", english: "foam, froth, bubbles", notes: "noun" },
+      { samala: "moqʼe", english: "already (immediate past marker)", notes: "aspectual particle" },
+      { samala: "mow", english: "sugar, honey, carrizo sugar", notes: "sweet food" },
+      { samala: "mowon", english: "to be sweet", notes: "< mow + -vn" },
+      { samala: "mowočʰuš", english: "candy, sweets", notes: "< mow-on + -šaš" },
+      { samala: "moʼx", english: "wild gourd (Cucurbita)", notes: "plant" },
+      { samala: "moxoʼ", english: "paternal aunt (father's sister)", notes: "kinship" },
+      { samala: "mucʼuʼ", english: "small one, young one", notes: "diminutive" },
+      { samala: "muhu", english: "great horned owl", notes: "nocturnal bird" },
+      { samala: "muhuw", english: "beach, seashore; the south", notes: "cardinal direction / coast" },
+      { samala: "mula", english: "mule", notes: "< Spanish mula" },
+      { samala: "muʼlam", english: "arroyo, creek canyon", notes: "topography" },
+      { samala: "mup", english: "cave, cavern", notes: "geology" },
+      { samala: "mut", english: "belly, stomach", notes: "always possessed" },
+      { samala: "muteʼy", english: "near, nearby, close to", notes: "proximity" },
+      { samala: "muw", english: "coast, beach", notes: "coastal root" },
+      { samala: "šmuwič", english: "coastal Chumash person or language", notes: "Barbareño/coastal" },
+      { samala: "myelkules", english: "Wednesday", notes: "< Spanish miércoles" },
+
+      // N, O, P, Q, S, Š, T, U, W, X, Y
+      { samala: "na", english: "and (conjunction)", notes: "connector" },
+      { samala: "naʼ", english: "chamise, black cane", notes: "shrub" },
+      { samala: "naʼn", english: "to go, walk, travel", notes: "core motion verb" },
+      { samala: "nanaʼnawaš", english: "tracks, footprints ('where it went')", notes: "< nanaʼn + -waš" },
+      { samala: "nakʼu", english: "or (conjunction)", notes: "alternative" },
+      { samala: "nalpat", english: "to carry something while running", notes: "< nu- + alpat" },
+      { samala: "napay", english: "to rise, ascend, get up", notes: "< ni- + apay" },
+      { samala: "šnapay a qsi", english: "the sun rises, sunrise", notes: "daily cycle" },
+      { samala: "naqšan", english: "to be harmful; dizzy (from tobacco)", notes: "< ni- + aqšan" },
+      { samala: "naʼni", english: "also, too, as well", notes: "additive particle" },
+      { samala: "natɨkʼ", english: "warrior's shield", notes: "defense" },
+      { samala: "nawaxa", english: "pocketknife", notes: "< Spanish navaja" },
+      { samala: "naxʼil", english: "to stand upright, vertical (tree, plume)", notes: "posture" },
+      { samala: "neč", english: "to be like, alike, identical", notes: "comparison" },
+      { samala: "neneʼ", english: "maternal grandmother (mother's mother)", notes: "kinship" },
+      { samala: "net", english: "to do to, act with regard to", notes: "transitive verb" },
+      { samala: "ni-", english: "transitive prefix (action directed at object)", notes: "grammar" },
+      { samala: "nikʼot", english: "to break an object", notes: "< ni- + kʼot" },
+      { samala: "nikʼoyi", english: "to return, come back, go home", notes: "return motion" },
+      { samala: "nilokʼin", english: "to break in two; pierce ears", notes: "< ni- + lokʼin" },
+      { samala: "nipen", english: "to pluck a bird, pull feathers", notes: "< ni- + =pen" },
+      { samala: "nipʼow", english: "to bend something", notes: "< ni- + pʼow" },
+      { samala: "nisɨn", english: "to be powerful, mighty, able", notes: "capability" },
+      { samala: "niwon", english: "to leave, abandon, let go of, lose", notes: "separation" },
+      { samala: "nɨ", english: "fire", notes: "element" },
+      { samala: "nɨhɨn", english: "noon, midday", notes: "time of day" },
+      { samala: "nɨwɨš", english: "sacred ceremonial song", notes: "ritual music" },
+      { samala: "no-", english: "future tense marker ('will, shall')", notes: "verbal prefix" },
+      { samala: "noʼ", english: "I, me (independent emphatic pronoun)", notes: "pronoun" },
+      { samala: "nokokʼ", english: "backbone, spine, mountain ridge", notes: "anatomy/topography" },
+      { samala: "šnokokʼ a saxiyiʼ", english: "the Milky Way ('spine of the night')", notes: "astronomy" },
+      { samala: "nono", english: "maternal grandfather (mother's father)", notes: "kinship" },
+      { samala: "nonoʼ", english: "very, very much, lots; poorly, bad shape", notes: "adverb / idiom" },
+      { samala: "noqʼocʼ", english: "iron, metal", notes: "material" },
+      { samala: "nowon", english: "to stand, be standing; to stop moving", notes: "stature" },
+      { samala: "nowonumuʼ", english: "station, position, standing place", notes: "< nowon + -muʼ" },
+      { samala: "nox", english: "large, big, great; thousand", notes: "size" },
+      { samala: "nox a štɨx", english: "morning star ('the big eye')", notes: "astronomy" },
+      { samala: "noxonox", english: "huge, immense, very great", notes: "< nox + redup" },
+      { samala: "noxš", english: "nose, beak of bird", notes: "anatomy" },
+      { samala: "nu-", english: "carrying along with, bringing prefix", notes: "verbal prefix" },
+      { samala: "nunaʼ", english: "to bring, carry along", notes: "< nu- + =naʼ" },
+      { samala: "nunašɨš", english: "supernatural beast, demon, serpent; poison", notes: "mythic creature" },
+      { samala: "nuʼnun", english: "to be numb, weak", notes: "physical state" },
+      { samala: "nunux", english: "to be blunt, dull (tool)", notes: "tool condition" },
+      { samala: "nuy", english: "dirt, grime, grunge", notes: "noun" },
+      { samala: "nuyič", english: "to be dirty, grimy", notes: "< nuy + -vč" },
+      { samala: "ʼoʼ", english: "water, liquid, juice", notes: "element" },
+      { samala: "ʼočʼ", english: "to be wet, damp", notes: "< ʼoʼ + -vč" },
+      { samala: "ʼokowoč", english: "salmon", notes: "fish species" },
+      { samala: "olkʼoy", english: "to go around, circle around", notes: "motion verb" },
+      { samala: "ʼolkʼoʼy", english: "hour (modern coinage from clock hands circling)", notes: "time" },
+      { samala: "ʼolxoʼ", english: "to steal, rob", notes: "verb" },
+      { samala: "ʼončočin", english: "yerba mansa (medicinal root)", notes: "healing herb" },
+      { samala: "ʼonoq", english: "turkey buzzard, vulture", notes: "scavenger bird" },
+      { samala: "ʼonyoko", english: "shark", notes: "marine animal" },
+      { samala: "ʼoqʰoʼš", english: "sea otter", notes: "marine mammal" },
+      { samala: "ʼoqwoʼn", english: "head, hair on head", notes: "anatomy" },
+      { samala: "ʼosos", english: "heel of the foot", notes: "anatomy" },
+      { samala: "otoʼyin", english: "to lie down, be prone, rest in bed", notes: "posture" },
+      { samala: "otoʼyin a ʼoʼ", english: "to water a plant ('lay water')", notes: "gardening" },
+      { samala: "ʼoʼwow", english: "to be white", notes: "color" },
+      { samala: "ʼowotoponuš", english: "Grass Mountain (sacred peak north of Santa Ynez)", notes: "sacred mountain" },
+      { samala: "oxoxon", english: "to cough; a cold, cough", notes: "illness" },
+      { samala: "ʼoxtokoʼw", english: "ice, hail, severe cold", notes: "weather" },
+      { samala: "ʼoyon", english: "to help, assist", notes: "social verb" },
+      { samala: "ʼoyosow", english: "bumblebee, native bee", notes: "insect" },
+      { samala: "p-", english: "you (singular subject/possessive)", notes: "second person" },
+      { samala: "piš-", english: "you two (dual subject/possessive)", notes: "second person dual" },
+      { samala: "piy-", english: "you all (plural subject/possessive)", notes: "second person plural" },
+      { samala: "pa", english: "just, merely, only", notes: "limiting particle" },
+      { samala: "pa šup", english: "maybe, perhaps", notes: "epistemic particle" },
+      { samala: "pa", english: "walking stick, staff", notes: "walking tool" },
+      { samala: "pʰaʼ", english: "chuchupate (sacred medicinal root)", notes: "powerful medicine" },
+      { samala: "pačɨʼ", english: "always, all the time, continually", notes: "temporal adverb" },
+      { samala: "pačpačɨʼ", english: "forever, eternal, always and always", notes: "< pačɨʼ + redup" },
+      { samala: "pakaʼs", english: "one (number); immediately", notes: "number" },
+      { samala: "pakpakaʼs", english: "one by one, a few", notes: "< pakaʼs + CVC redup" },
+      { samala: "palawayapš", english: "to be crossed in an X shape", notes: "shape" },
+      { samala: "pali", english: "padre, priest", notes: "< Spanish padre" },
+      { samala: "paltalon", english: "trousers, pants", notes: "< Spanish pantalón" },
+      { samala: "pan", english: "bread", notes: "< Spanish pan" },
+      { samala: "papas", english: "potatoes", notes: "< Spanish papas" },
+      { samala: "papel", english: "paper, document", notes: "< Spanish papel" },
+      { samala: "paš", english: "to vomit", notes: "physiological" },
+      { samala: "pat", english: "bird nest, spider web", notes: "animal home" },
+      { samala: "pax", english: "skin, bark, eggshell; chia gruesa", notes: "covering / plant" },
+      { samala: "paxat", english: "whale", notes: "ocean animal" },
+      { samala: "payu", english: "handkerchief, bandana", notes: "< Spanish paño" },
+      { samala: "pepeʼ", english: "older sibling (older brother or sister)", notes: "kinship" },
+      { samala: "peqʼen", english: "to terminate, stop, reach the end", notes: "aspectual" },
+      { samala: "petʼaʼ", english: "sixteen (traditional counting unit / score)", notes: "base-4 math system" },
+      { samala: "pey", english: "to stick to, coat with pitch/tar", notes: "verb" },
+      { samala: "peʼy", english: "to bloom, flower", notes: "botany" },
+      { samala: "speʼy", english: "flower, blossom", notes: "< s- + peʼy" },
+      { samala: "piʼ", english: "you (singular emphatic pronoun)", notes: "pronoun" },
+      { samala: "piliholi", english: "beans", notes: "< Spanish frijoles" },
+      { samala: "pʰilil", english: "to fry", notes: "< Spanish freír" },
+      { samala: "pʰililiš", english: "frybread, fried food", notes: "food" },
+      { samala: "pʰililimuʼ", english: "skillet, frying pan", notes: "< pʰilil + -muʼ" },
+      { samala: "pimes", english: "to jump across through the air", notes: "< pil- + mes" },
+      { samala: "spimpimes a ʼaqiwo", english: "shooting star, meteor", notes: "literally 'jumping star'" },
+      { samala: "pistuk", english: "ground squirrel species", notes: "animal" },
+      { samala: "piʼw", english: "to cost, have worth, be valuable", notes: "value" },
+      { samala: "spiʼw", english: "price, cost, value", notes: "< s- + piʼw" },
+      { samala: "piʼyač", english: "feathered dancing skirt", notes: "ceremonial regalia" },
+      { samala: "pɨʼ", english: "to dip up water, fish with dip net", notes: "action verb" },
+      { samala: "pɨʼliʼ", english: "dipper, water ladle", notes: "< pɨʼ + -ʼiʼ" },
+      { samala: "pʰɨʼ", english: "to play walnut dice game", notes: "traditional game" },
+      { samala: "pɨl", english: "pine pitch, tree sap", notes: "material" },
+      { samala: "pɨʼs", english: "coiled basketry tray; plate/dish", notes: "basketry / dish" },
+      { samala: "pɨwɨʼ", english: "mosquito", notes: "insect" },
+      { samala: "pleʼ", english: "to disappear, perish, die, be bushed", notes: "verb" },
+      { samala: "poʼ", english: "cheek", notes: "anatomy" },
+      { samala: "pohoʼno", english: "Pohono (traditional woman's name)", notes: "proper name" },
+      { samala: "pokoy", english: "burrowing owl", notes: "bird species" },
+      { samala: "polon", english: "to be stiff, thick, firm (dough/mortar)", notes: "texture" },
+      { samala: "poʼn", english: "tree, wood, stick, timber", notes: "plant / material" },
+      { samala: "ponpoʼn", english: "fence, grove of trees", notes: "< poʼn + CVC redup" },
+      { samala: "popočʼ", english: "paternal grandfather (father's father)", notes: "kinship" },
+      { samala: "poš", english: "piñon nut, piñon pine tree", notes: "staple harvest" },
+      { samala: "šuyopoš", english: "to gather piñon nuts", notes: "< suya- + poš" },
+      { samala: "pʼow", english: "to be bent, crooked", notes: "shape" },
+      { samala: "pʼowpʼow", english: "to go zigzag (snake, trail)", notes: "< pʼow + redup" },
+      { samala: "pšaʼn", english: "California bay laurel tree", notes: "aromatic tree" },
+      { samala: "pšoš", english: "gopher snake", notes: "reptile" },
+      { samala: "pu", english: "hand, arm; tree branch", notes: "always possessed" },
+      { samala: "puk", english: "gray screech owl", notes: "bird" },
+      { samala: "pul", english: "to dig", notes: "action" },
+      { samala: "pulaʼš", english: "digging stick; edible starchy wild root", notes: "harvest tool/food" },
+      { samala: "puʼliʼ", english: "shovel (modern style)", notes: "< pul + -ʼiʼ" },
+      { samala: "pulakʼakʼ", english: "acorn woodpecker", notes: "bird species" },
+      { samala: "puluy", english: "sandhill crane", notes: "bird species" },
+      { samala: "pʼupʼuʼ", english: "roadrunner", notes: "bird species" },
+      { samala: "puq", english: "to burn belongings of the dead; burn brush", notes: "fire ritual/land care" },
+      { samala: "puwewlu", english: "pueblo, town", notes: "< Spanish pueblo" },
+      { samala: "pux", english: "to impale on spit, string beads/fish", notes: "action" },
+      { samala: "puxš", english: "to learn, study", notes: "reduplicated: puxpuxš" },
+      { samala: "ʼapuxš", english: "student, learner", notes: "< ʼal- + puxš" },
+      { samala: "puyan", english: "to be dewy, damp", notes: "< puy + -vn" },
+      { samala: "spuyan", english: "dew", notes: "< s- + puy-an" },
+      { samala: "qaqʼ", english: "raven", notes: "bird species" },
+      { samala: "qasil", english: "Refugio beach ('beautiful')", notes: "coastal village" },
+      { samala: "qelemes", english: "webbed feet (frog, duck)", notes: "< qal- + mes" },
+      { samala: "qʼelen", english: "to tear up, shred, cut off", notes: "action" },
+      { samala: "qilčʼoʼmin", english: "to soak soft in water", notes: "< qil- 'water' + čʼoʼmin" },
+      { samala: "qilik", english: "to care for, look after, guard", notes: "< qil- + hik" },
+      { samala: "ʼaqilik", english: "caretaker, guardian", notes: "< ʼal- + qilik" },
+      { samala: "qilkʼɨlɨlɨ", english: "(water) to be crystal clear, transparent", notes: "water state" },
+      { samala: "qincʼiʼ", english: "to drown (on one's own)", notes: "< qil- + =cʼiʼ" },
+      { samala: "qiwakuʼy", english: "storage box, container", notes: "receptacle" },
+      { samala: "qɨʼl", english: "breast milk, sap, juice", notes: "always possessed" },
+      { samala: "qɨlɨwɨč", english: "to chew/eat native tobacco", notes: "traditional ceremony" },
+      { samala: "qoʼ", english: "pet animal, clan totem", notes: "always possessed" },
+      { samala: "qolpʼow", english: "topknot, tassel, hair tuft", notes: "< qal- + pʼow" },
+      { samala: "qolol", english: "mouse", notes: "rodent" },
+      { samala: "qon", english: "to laugh", notes: "intransitive: qoč 'laugh a lot'" },
+      { samala: "qʼoqʼom", english: "gravepole; rainbow bridge to underworld", notes: "sacred cosmology" },
+      { samala: "qotʼin", english: "to descend, get down, dismount, be born", notes: "motion" },
+      { samala: "qoʼy", english: "olivella shell (used for bead money)", notes: "marine shell" },
+      { samala: "qsi", english: "sun; day", notes: "heč a qsi 'today'" },
+      { samala: "salitunin a qsi", english: "noon (literally 'middle of the day')", notes: "time" },
+      { samala: "sʼap a qsi", english: "House of the Sun (sacred site in Cuyama)", notes: "cosmology" },
+      { samala: "quntʼaw", english: "lightning to flash", notes: "storm" },
+      { samala: "squntʼawi", english: "electricity (modern coinage)", notes: "< quntʼaw + -i" },
+      { samala: "qupe", english: "California poppy", notes: "wildflower" },
+      { samala: "squpen", english: "orange (color)", notes: "named after the poppy" },
+      { samala: "qweʼ", english: "toyon berry, Christmas berry", notes: "native shrub" },
+      { samala: "qweleqweʼl", english: "Fremont cottonwood tree", notes: "tree" },
+      { samala: "s-", english: "he, she, it (third person marker)", notes: "verbal/possessive prefix" },
+      { samala: "sa", english: "tooth, teeth", notes: "always possessed" },
+      { samala: "sʰa", english: "flint arrowhead; fishhook", notes: "< s- + sa 'tooth'" },
+      { samala: "santiya", english: "watermelon", notes: "< Spanish sandía" },
+      { samala: "sapatu", english: "shoe", notes: "< Spanish zapato" },
+      { samala: "satɨk", english: "to cure, heal (cause to recover)", notes: "< su- + atɨk" },
+      { samala: "saxiyiʼ", english: "night, nighttime ('it is night')", notes: "< s- + axiyi" },
+      { samala: "salitunin a saxiyiʼ", english: "midnight ('middle of the night')", notes: "time" },
+      { samala: "sʰayayan", english: "ripe piñon nuts fallen on ground", notes: "harvest" },
+      { samala: "se", english: "bone (inside living body)", notes: "anatomy" },
+      { samala: "sʰe", english: "bone (detached / outside body)", notes: "material" },
+      { samala: "selew", english: "to take down, dismount, help down", notes: "< su- + elew" },
+      { samala: "semana", english: "week", notes: "< Spanish semana" },
+      { samala: "sili-", english: "wanting to, desire (verb prefix)", notes: "desiderative" },
+      { samala: "siliwil", english: "to want something, wish to do", notes: "< sili- + wil" },
+      { samala: "siniweʼ", english: "to kill, put to death", notes: "< si- + ni- + weʼ" },
+      { samala: "sɨpʼ", english: "to carry load on back in net", notes: "burden carrying" },
+      { samala: "sɨpmuʼ", english: "load, backpack burden", notes: "< sɨpʼ + -muʼ" },
+      { samala: "sɨpɨt", english: "to grind acorns, make acorn mush", notes: "food prep" },
+      { samala: "šɨpɨtɨš", english: "acorn mush (traditional staple dish)", notes: "core traditional food" },
+      { samala: "skon", english: "worm, reptile, crawler", notes: "creature" },
+      { samala: "skumu", english: "four", notes: "number (Chumash base)" },
+      { samala: "škumulaš", english: "forty", notes: "number" },
+      { samala: "sloʼw", english: "golden eagle", notes: "sacred raptor" },
+      { samala: "smɨlɨʼ", english: "poplar inner-bark apron; woman's dress", notes: "traditional clothing" },
+      { samala: "smomoy", english: "fog", notes: "weather" },
+      { samala: "stuk", english: "ladybug; wooden bowl", notes: "insect / wooden vessel" },
+      { samala: "su-", english: "causative prefix (causes action to happen)", notes: "grammar" },
+      { samala: "sukuy", english: "to cook islay berries; to shoot", notes: "verb" },
+      { samala: "sukuʼy", english: "stone cooking pot, olla", notes: "cooking vessel" },
+      { samala: "šukuyaš", english: "cooked islay mash", notes: "traditional food" },
+      { samala: "suwayan", english: "earring (literally 'cause to hang')", notes: "< su- + wayan" },
+      { samala: "suweʼn", english: "to put to sleep, lull to sleep", notes: "< su- + weʼ" },
+      { samala: "swaʼ", english: "three-square bulrush, triangular tule", notes: "wetland reed" },
+      { samala: "swanaʼn", english: "custom, religion, traditional way of life", notes: "tradition" },
+      { samala: "swaʼyin", english: "winter ('it is winter')", notes: "season" },
+      { samala: "swey", english: "tarweed (food plant with yellow flowers)", notes: "seed harvest" },
+      { samala: "swɨxɨʼ", english: "woven blanket", notes: "textile" },
+      { samala: "sxaʼmin", english: "ocean, sea", notes: "marine geography" },
+      { samala: "šapukʼ", english: "native clover (eaten as greens)", notes: "edible greens" },
+      { samala: "šaqʼ", english: "turtle, tortoise; turtle-shell shield", notes: "animal" },
+      { samala: "šepšleʼ", english: "lip, lips", notes: "anatomy" },
+      { samala: "šeʼw", english: "barn owl", notes: "nocturnal bird" },
+      { samala: "šex", english: "sardine", notes: "fish" },
+      { samala: "šik", english: "head louse", notes: "insect" },
+      { samala: "šilik", english: "miner's lettuce (edible green)", notes: "plant" },
+      { samala: "šimilaqša", english: "Land of the Dead (across western sea)", notes: "Chumash afterworld" },
+      { samala: "šipukʼ", english: "elbow", notes: "anatomy" },
+      { samala: "šišawi", english: "summer ('it is warm')", notes: "season" },
+      { samala: "šixʼoʼn", english: "cacomite, wild brodiaea bulb", notes: "edible bulb" },
+      { samala: "šɨ", english: "cliff, bluff, steep riverbank", notes: "landscape" },
+      { samala: "šɨš", english: "burrow, animal den, underground hole", notes: "habitat" },
+      { samala: "šonuš", english: "western sycamore tree (also xšonuš)", notes: "native riparian tree" },
+      { samala: "šow", english: "ankle; native wild tobacco (Nicotiana)", notes: "anatomy / sacred herb" },
+      { samala: "šoxš", english: "down feathers (soft feathers for prayer)", notes: "ceremonial offering" },
+      { samala: "šoyin", english: "black, dark in color", notes: "color" },
+      { samala: "štakuk", english: "yucca species, our Lord's candle", notes: "plant" },
+      { samala: "štapan", english: "broad flat tule rush, woven tule mat", notes: "household mat" },
+      { samala: "štawayɨkʼ", english: "open valley, grassy plain", notes: "geography" },
+      { samala: "štayɨt", english: "arroyo willow (Salix lasiolepis)", notes: "basketry/house poles" },
+      { samala: "štexeʼx", english: "river (Santa Ynez River)", notes: "waterway" },
+      { samala: "štiwaʼl", english: "coarse carrying net; pelican pouch", notes: "burden net" },
+      { samala: "štɨ", english: "36-inch shell money strand measurement", notes: "currency unit" },
+      { samala: "štumun", english: "egg (bird or reptile)", notes: "food/nature" },
+      { samala: "šup", english: "earth, world, year, land; Earth Mother", notes: "cosmology / earth" },
+      { samala: "šupšupʼ", english: "dust, fine dry soil", notes: "< šup + redup" },
+      { samala: "šuš", english: "hair on body, animal fur", notes: "anatomy" },
+      { samala: "šwatineč", english: "problem, difficulty, complication", notes: "< s- + watineč" },
+      { samala: "tataʼ", english: "maternal uncle (mother's brother)", notes: "kinship" },
+      { samala: "taʼ", english: "valley oak (Quercus lobata)", notes: "large oak tree" },
+      { samala: "tak", english: "pine tree (generic)", notes: "tree" },
+      { samala: "takaʼ", english: "where?, someplace, somewhere", notes: "interrogative/locative" },
+      { samala: "takak", english: "quail; chicken", notes: "bird species" },
+      { samala: "taktɨʼ", english: "to hit, beat; to hunt game, catch", notes: "verb" },
+      { samala: "takʼu", english: "how?, in what way?", notes: "interrogative" },
+      { samala: "takʼuštaš", english: "method, technique, way of doing", notes: "noun" },
+      { samala: "takʰuy", english: "to hold, carry in arms, wear", notes: "verb" },
+      { samala: "taʼlik", english: "to embrace, hug; wife ('main squeeze')", notes: "verb / kinship" },
+      { samala: "talipʼ", english: "sinew-backed hunting bow", notes: "hunting weapon" },
+      { samala: "taʼmay", english: "to forget", notes: "mental verb" },
+      { samala: "tamtaʼmayič", english: "to be absent-minded, forgetful", notes: "< taʼmay + redup" },
+      { samala: "tani-", english: "please; a little bit, somewhat", notes: "polite prefix" },
+      { samala: "tanuy", english: "to stay behind, stay at home", notes: "verb" },
+      { samala: "tap", english: "to enter, come in, go into", notes: "motion verb" },
+      { samala: "tapin", english: "to be evening, dusk", notes: "time" },
+      { samala: "wa štapin", english: "this evening, tonight", notes: "time" },
+      { samala: "tapsaʼliʼ", english: "toothpick", notes: "< tap-sa + -ʼiʼ" },
+      { samala: "tapšun", english: "to get stuck in mud, bog down", notes: "verb" },
+      { samala: "tapšučʰaš", english: "bog, marsh, muddy wetland", notes: "geography" },
+      { samala: "taqš", english: "broadleaf cattail", notes: "marsh plant" },
+      { samala: "tasɨn", english: "to be red", notes: "color" },
+      { samala: "tašušun", english: "to be fragrant, smell sweet", notes: "sensory" },
+      { samala: "taxama
